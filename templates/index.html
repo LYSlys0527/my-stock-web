@@ -2,12 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>專業級自製看盤軟體 | 免費台股美股即時K線圖、MACD指標、均線觀測站</title>
-    
-    <meta name="description" content="最流暢的網頁版自製看盤系統。支援台股中文、美股英文公司名稱自動智慧辨識，內建雙向十字虛線連動、成交量、MACD 技術指標與即時均線查詢。">
-    <meta name="keywords" content="看盤軟體, 台股K線, 美股K線, MACD, 均線, 自製看盤系統">
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專業級自製看盤軟體 | 完美修復版</title>
     <style>
         body {
             margin: 0;
@@ -22,7 +17,7 @@
             margin-bottom: 10px;
             align-items: center;
         }
-        input, button, select {
+        input, select {
             background: #2a2b30;
             border: 1px solid #44454a;
             color: #e1e2e6;
@@ -30,34 +25,56 @@
             border-radius: 4px;
             font-size: 14px;
         }
-        button {
+        input:focus {
+            outline: 1px solid #2962ff;
+        }
+        
+        .search-btn {
             background: #2962ff;
-            font-weight: bold;
+            color: white;
+            font-size: 16px;
             cursor: pointer;
             border: none;
+            padding: 9px 15px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
         }
-        button:hover { background: #1e4bd6; }
+        .search-btn:hover { background: #1e4bd6; }
         
         .btn-group { display: flex; gap: 2px; margin-left: 10px; }
-        .btn-group button { background: #2a2b30; border: 1px solid #44454a; border-radius: 0; }
+        .btn-group button { background: #2a2b30; border: 1px solid #44454a; color: #e1e2e6; border-radius: 0; padding: 10px 12px; cursor: pointer; font-size: 14px;}
         .btn-group button:first-child { border-radius: 4px 0 0 4px; }
         .btn-group button:last-child { border-radius: 0 4px 4px 0; }
-        .btn-group button.active { background: #ff4a4a; border-color: #ff4a4a; }
+        .btn-group button.active { background: #ff4a4a; border-color: #ff4a4a; font-weight: bold; }
 
         .info-panel {
             display: flex;
-            gap: 25px;
+            justify-content: space-between;
+            align-items: center;
             background: #141518;
-            padding: 10px 15px;
+            padding: 12px 20px;
             border: 1px solid #2d2e33;
             border-bottom: none;
-            font-size: 14px;
             border-radius: 4px 4px 0 0;
         }
         .info-item { font-weight: bold; }
-        .up-text { color: #ff4a4a; }
-        .down-text { color: #26a69a; }
         .company-text { color: #2962ff; font-size: 15px; }
+
+        .price-display-block {
+            font-size: 28px; 
+            font-weight: bold; 
+            font-family: monospace;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+        .change-text {
+            font-size: 16px;
+            font-weight: bold;
+        }
 
         .main-content {
             display: flex;
@@ -96,6 +113,7 @@
             padding: 10px; background: #1c1d22; border: 1px solid #2d2e33;
             margin-bottom: 8px; border-radius: 4px; cursor: pointer;
             text-align: center; font-weight: bold; transition: all 0.2s;
+            font-size: 13px;
         }
         .history-item:hover { background: #2962ff; border-color: #2962ff; color: #fff; }
         .no-history { color: #5d606b; font-size: 13px; text-align: center; margin-top: 20px; font-style: italic; }
@@ -103,17 +121,17 @@
 </head>
 <body>
 
-    <h2>🚀 專業級自製看盤軟體 (企業名稱精準對應版)</h2>
+    
     
     <div class="control-panel">
-        <select id="market">
-            <option value="TW">台股</option>
-            <option value="US" selected>美股</option>
-        </select>
-        <input type="text" id="symbol" value="AAPL" placeholder="輸入代碼">
-        <button onclick="updateChart(true)">看盤</button>
+        <input type="text" id="symbol" value="AAPL" placeholder="輸入股票代碼 (如: 2330, 5347, NVDA)" style="width: 280px;">
+        <button class="search-btn" onclick="updateChart(true)" title="搜尋股票">🔍</button>
 
         <div class="btn-group">
+            <button id="btn-15m" onclick="changePeriod('15m')">15分</button>
+            <button id="btn-30m" onclick="changePeriod('30m')">30分</button>
+            <button id="btn-60m" onclick="changePeriod('60m')">60分</button>
+            <button id="btn-4h" onclick="changePeriod('4h')">4時</button>
             <button id="btn-D" class="active" onclick="changePeriod('D')">日</button>
             <button id="btn-W" onclick="changePeriod('W')">週</button>
             <button id="btn-M" onclick="changePeriod('M')">月</button>
@@ -121,9 +139,19 @@
     </div>
 
     <div class="info-panel" id="infoPanel">
-        <div class="info-item company-text">🏢 <span id="info-company">載入中...</span></div>
-        <div class="info-item">🔍 當前觀測日期: <span id="info-date">--</span></div>
-        <div class="info-item">終場收盤價: <span id="info-close">--</span></div>
+        <div style="display: flex; gap: 30px; align-items: center;">
+            <div class="info-item company-text" style="font-size: 18px; color: #fff;"><span id="info-company">載入中...</span></div>
+            
+            <div class="price-display-block">
+                <span id="info-price">--.--</span>
+                <span id="info-change" class="change-text">--.-- (--%)</span>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 20px; align-items: center; font-size: 13px; color: #70737d;">
+            <div>數據時間: <span id="info-date" style="color: #e1e2e6;">--</span></div>
+            <div id="refresh-status" style="color: #26a69a; font-weight: bold; transition: opacity 0.15s;">盤中自動追蹤中</div>
+        </div>
     </div>
 
     <div class="main-content">
@@ -132,7 +160,7 @@
         </div>
         
         <div class="sidebar">
-            <h3>⏱️ 最近搜尋紀錄</h3>
+            <h3>最近搜尋紀錄</h3>
             <ul class="history-list" id="historyList"></ul>
         </div>
     </div>
@@ -147,105 +175,122 @@
         
         let currentCompanyName = "";
         let currentTickerLabel = "";
-
-        // 精心準備的台美股核心對照表，防止 API 被跨網域阻擋時能 100% 精準顯示名稱
-        const localStockDatabase = {
-            // 台股中文對照
-            "2330.TW": "台積電", "2317.TW": "鴻海", "2454.TW": "聯發科", "2308.TW": "台達電",
-            "2382.TW": "廣達", "2303.TW": "聯電", "2881.TW": "富邦金", "2882.TW": "國泰金",
-            "2891.TW": "中信金", "2603.TW": "長榮", "2609.TW": "陽明", "2615.TW": "萬海",
-            "2610.TW": "華航", "2618.TW": "長榮航", "2324.TW": "仁寶", "2357.TW": "華碩",
-            "3231.TW": "緯創", "2356.TW": "英業達", "2886.TW": "兆豐金", "5880.TW": "合庫金",
-            "0050.TW": "元大台灣50", "0056.TW": "元大高股息", "00878.TW": "國泰永續高股息",
-            
-            // 美股英文對照
-            "AAPL": "Apple Inc.", "TSLA": "Tesla, Inc.", "NVDA": "NVIDIA Corporation",
-            "MSFT": "Microsoft Corp.", "AMZN": "Amazon.com, Inc.", "GOOGL": "Alphabet Inc.",
-            "META": "Meta Platforms", "NFLX": "Netflix, Inc.", "AMD": "Advanced Micro Devices",
-            "INTC": "Intel Corporation", "QQQ": "Invesco QQQ Trust", "SPY": "SPDR S&P 500 ETF"
-        };
+        let activeFinalTicker = ""; 
+        
+        let priceRefreshInterval = null; 
 
         function changePeriod(p) {
             currentPeriod = p;
-            ['D', 'W', 'M'].forEach(per => { document.getElementById(`btn-${per}`).classList.remove('active'); });
+            ['15m', '30m', '60m', '4h', 'D', 'W', 'M'].forEach(per => { 
+                document.getElementById(`btn-${per}`).classList.remove('active'); 
+            });
             document.getElementById(`btn-${p}`).classList.add('active');
+            
+            if (p.includes('m') || p === '4h') displayCount = 100;
             if (p === 'D') displayCount = 80;
             if (p === 'W') displayCount = 52;
             if (p === 'M') displayCount = 36;
+            
             updateChart(false);
         }
 
-        // 精準多重管道查詢公司名
-        async function fetchCompanyName(ticker, market) {
-            currentTickerLabel = ticker.replace('.TW', '');
-
-            // 優先管道 1：檢查內建資料庫（速度最快且 100% 成功）
-            if (localStockDatabase[ticker]) {
-                currentCompanyName = localStockDatabase[ticker];
-                return;
+        function formatTickerForBackend(input) {
+            let clean = input.trim().toUpperCase();
+            clean = clean.replace('.TWO', '').replace('.TW', '');
+            if (/^\d+/.test(clean)) {
+                return clean + '.TW'; 
             }
-
-            // 備用管道 2：使用開放、無 CORS 限制的通用查名服務
-            try {
-                const cleanTicker = market === 'TW' ? currentTickerLabel : ticker;
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://query1.finance.yahoo.com/v1/finance/search?q=' + ticker)}`);
-                const wrapper = await res.json();
-                const json = JSON.parse(wrapper.contents);
-                
-                if (json.quotes && json.quotes.length > 0) {
-                    let name = json.quotes[0].shortname || json.quotes[0].longname;
-                    if (name) {
-                        currentCompanyName = name.replace('.TW', '');
-                        return;
-                    }
-                }
-            } catch (e) {
-                console.log("異步查名輕微延遲，啟動兜底命名機制");
-            }
-
-            // 兜底管道 3：依市場類型自動格式化顯示
-            currentCompanyName = market === 'TW' ? `台股 ${currentTickerLabel}` : `US Stock ${currentTickerLabel}`;
+            return clean;
         }
 
+        function getCleanLogTicker(input) {
+            return input.trim().toUpperCase().replace('.TWO', '').replace('.TW', '');
+        }
+
+        // 🎯 核心大重構：確保所有 404 的上櫃/興櫃代碼被修正後，連同全域變數一起綁定！
         async function updateChart(isNewSearch = false) {
-            const market = document.getElementById('market').value;
-            let symbol = document.getElementById('symbol').value.trim().toUpperCase();
-            if (!symbol) return;
+            const inputVal = document.getElementById('symbol').value;
+            if (!inputVal.trim()) return;
 
-            let displaySymbol = symbol;
-            if (market === 'TW' && !symbol.includes('.')) {
-                symbol += '.TW';
-                displaySymbol = symbol; 
+            if (isNewSearch || !activeFinalTicker) {
+                activeFinalTicker = formatTickerForBackend(inputVal);
             }
-
-            // 執行查名邏輯
-            await fetchCompanyName(symbol, market);
-            document.getElementById('info-company').innerText = `${currentCompanyName} (${currentTickerLabel})`;
 
             try {
                 const currentOrigin = window.location.origin;
-                const response = await fetch(`${currentOrigin}/api/stock?ticker=${symbol}&type=${currentPeriod}`);
-                const data = await response.json();
+                let response = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
+                let resData = await response.json();
                 
-                if (data.error || !Array.isArray(data) || data.length === 0) {
-                    alert("資料載入失敗，請確認代碼！");
+                // 🔥【重中之重】如果用 .TW 噴 404 或帶 error，立刻改換 .TWO
+                if ((response.status !== 200 || resData.error) && activeFinalTicker.includes('.TW')) {
+                    console.log(`⚠️偵測到 ${activeFinalTicker} 撈取失敗，自動重試切換為上櫃市場格式 (.TWO)...`);
+                    activeFinalTicker = activeFinalTicker.replace('.TW', '.TWO'); // 更新全域定位代碼，讓定時器同步修正！
+                    response = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
+                    resData = await response.json();
+                }
+
+                if (resData.error) {
+                    alert("資料載入失敗，此代碼可能不存在！");
                     return;
                 }
 
-                rawData = data;
-                calculateMA(5, 'ma5');
-                calculateMA(20, 'ma20');
-                calculateMA(60, 'ma60');
-                calculateMACD(); 
-
-                currentHoveredCandle = rawData[rawData.length - 1];
-                updateTopInfoPanel(currentHoveredCandle);
-                drawCanvasChart();
-
-                if (isNewSearch) { saveToHistory(displaySymbol, market); }
+                renderDataPayload(resData, inputVal, isNewSearch);
             } catch (err) {
                 console.error("前端抓取失敗:", err);
             }
+        }
+
+        function renderDataPayload(resData, inputVal, isNewSearch) {
+            currentCompanyName = resData.companyName;
+            currentTickerLabel = resData.tickerLabel;
+            rawData = resData.candles;
+
+            document.getElementById('info-company').innerText = `${currentCompanyName} (${currentTickerLabel})`;
+
+            calculateMA(5, 'ma5');
+            calculateMA(20, 'ma20');
+            calculateMA(60, 'ma60');
+            calculateMACD(); 
+
+            currentHoveredCandle = rawData[rawData.length - 1];
+            updateTopInfoPanel();
+            drawCanvasChart();
+
+            if (isNewSearch) { 
+                let isTW = currentCompanyName.includes('[市]') || currentCompanyName.includes('[櫃]') || currentCompanyName.includes('[興]');
+                saveToHistory(getCleanLogTicker(inputVal), isTW); 
+                document.getElementById('symbol').value = getCleanLogTicker(inputVal);
+            }
+            initAutoRefresh();
+        }
+
+        function initAutoRefresh() {
+            if (priceRefreshInterval) { clearInterval(priceRefreshInterval); }
+
+            priceRefreshInterval = setInterval(async () => {
+                if (!activeFinalTicker) return;
+
+                const statusEl = document.getElementById('refresh-status');
+                statusEl.style.opacity = '0.3';
+                setTimeout(() => { statusEl.style.opacity = '1'; }, 150);
+
+                try {
+                    const currentOrigin = window.location.origin;
+                    const response = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
+                    const resData = await response.json();
+                    
+                    if (resData && Array.isArray(resData.candles) && resData.candles.length > 0) {
+                        rawData = resData.candles;
+                        calculateMA(5, 'ma5');
+                        calculateMA(20, 'ma20');
+                        calculateMA(60, 'ma60');
+                        calculateMACD(); 
+
+                        updateTopInfoPanel();
+                        drawCanvasChart();
+                    }
+                } catch (e) { console.log("自動刷新延遲...", e); }
+            }, 2000); 
         }
 
         function calculateMACD() {
@@ -276,11 +321,36 @@
             }
         }
 
-        function updateTopInfoPanel(candle) {
-            if (!candle) return;
-            document.getElementById('info-date').innerText = candle.time;
-            document.getElementById('info-close').innerText = candle.close.toFixed(2);
-            document.getElementById('info-close').className = candle.close >= candle.open ? 'up-text' : 'down-text';
+        function updateTopInfoPanel() {
+            if (!rawData || rawData.length === 0) return;
+            
+            const todayCandle = rawData[rawData.length - 1];
+            const prevCandle = rawData.length > 1 ? rawData[rawData.length - 2] : todayCandle;
+            const basePrice = prevCandle.close; 
+            
+            const currentPrice = todayCandle.close;
+            const priceChange = currentPrice - basePrice;
+            const percentChange = basePrice !== 0 ? (priceChange / basePrice) * 100 : 0;
+
+            document.getElementById('info-date').innerText = todayCandle.time;
+            
+            const priceEl = document.getElementById('info-price');
+            priceEl.innerText = currentPrice.toFixed(2);
+            
+            const changeEl = document.getElementById('info-change');
+            const sign = priceChange > 0 ? '+' : '';
+            changeEl.innerText = `${sign}${priceChange.toFixed(2)} (${sign}${percentChange.toFixed(2)}%)`;
+
+            if (priceChange > 0) {
+                priceEl.style.color = '#ff4a4a';
+                changeEl.style.color = '#ff4a4a';
+            } else if (priceChange < 0) {
+                priceEl.style.color = '#26a69a';
+                changeEl.style.color = '#26a69a';
+            } else {
+                priceEl.style.color = '#e1e2e6';
+                changeEl.style.color = '#e1e2e6';
+            }
         }
 
         function drawCanvasChart() {
@@ -305,7 +375,6 @@
 
             if (rawData.length === 0) return;
 
-            // 浮水印大字畫布
             ctx.save();
             ctx.fillStyle = 'rgba(255, 255, 255, 0.025)'; 
             ctx.font = 'bold 36px sans-serif';
@@ -430,7 +499,6 @@
 
             if (hoveredCandleIndex !== -1) {
                 currentHoveredCandle = rawData[hoveredCandleIndex];
-                updateTopInfoPanel(currentHoveredCandle);
             }
 
             if (mouseX >= 0 && mouseX <= chartW && mouseY >= 0 && mouseY <= height) {
@@ -487,7 +555,7 @@
                 ctx.fillStyle = '#4fc3f7'; ctx.fillText(`MA60: ${hData.ma60 ? hData.ma60.toFixed(2) : '--'}`, 505, 20);
 
                 ctx.fillStyle = '#a1a4b0';
-                ctx.fillText(`成交量(股): ${hData.volume ? hData.volume.toLocaleString() : '0'}`, 10, volTop - 6);
+                ctx.fillText(`成交量: ${hData.volume ? hData.volume.toLocaleString() : '0'}`, 10, volTop - 6);
 
                 ctx.fillStyle = '#ffeb3b'; ctx.fillText(`DIF(快): ${hData.macd_dif ? hData.macd_dif.toFixed(3) : '--'}`, 10, macdTop - 6);
                 ctx.fillStyle = '#00e5ff'; ctx.fillText(`DEA(慢): ${hData.macd_dem ? hData.macd_dem.toFixed(3) : '--'}`, 130, macdTop - 6);
@@ -498,10 +566,10 @@
             }
         }
 
-        function saveToHistory(symbol, market) {
+        function saveToHistory(symbol, isTW) {
             let history = JSON.parse(localStorage.getItem('stock_history')) || [];
             history = history.filter(item => item.symbol !== symbol);
-            history.unshift({ symbol: symbol, market: market });
+            history.unshift({ symbol: symbol, isTW: isTW });
             if (history.length > 5) history = history.slice(0, 5);
             localStorage.setItem('stock_history', JSON.stringify(history));
             renderHistoryList();
@@ -514,16 +582,22 @@
             listEl.innerHTML = '';
             history.forEach(item => {
                 const li = document.createElement('li'); li.className = 'history-item';
-                const marketText = item.market === 'TW' ? '台股' : '美股';
-                li.innerText = `${item.symbol.replace('.TW', '')} (${marketText})`;
+                const marketText = item.isTW ? '台股' : '美股';
+                li.innerText = `${item.symbol} (${marketText})`;
                 li.onclick = () => {
-                    document.getElementById('market').value = item.market;
-                    document.getElementById('symbol').value = item.symbol.replace('.TW', '');
+                    document.getElementById('symbol').value = item.symbol;
                     updateChart(true);
                 };
                 listEl.appendChild(li);
             });
         }
+
+        document.getElementById('symbol').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                updateChart(true);
+            }
+        });
 
         const canvas = document.getElementById('stockCanvas');
         canvas.addEventListener('mousemove', (event) => {
@@ -535,7 +609,6 @@
         canvas.addEventListener('mouseleave', () => {
             mouseX = -1; mouseY = -1; 
             currentHoveredCandle = rawData[rawData.length - 1]; 
-            updateTopInfoPanel(currentHoveredCandle);
             drawCanvasChart();
         });
         canvas.addEventListener('wheel', (event) => {
