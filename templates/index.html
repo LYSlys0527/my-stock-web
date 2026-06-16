@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>專業級自製看盤軟體 | 完美修復版</title>
+    <title>Trading Terminal | Live</title>
     <style>
         body {
             margin: 0;
@@ -11,6 +11,23 @@
             color: #e1e2e6;
             font-family: sans-serif;
         }
+        /* 🎯 頂端品牌列：取代舊標題 */
+        .brand-header {
+            margin-bottom: 15px;
+        }
+        .main-title {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+        .sub-title {
+            font-size: 11px;
+            color: #70737d;
+            display: block;
+            margin-top: 2px;
+        }
+
         .control-panel {
             display: flex;
             gap: 10px;
@@ -121,10 +138,13 @@
 </head>
 <body>
 
-    
+    <div class="brand-header">
+        <span class="main-title">MARKET TERMINAL</span>
+        <span class="sub-title">Real-time Analytics Subsystem</span>
+    </div>
     
     <div class="control-panel">
-        <input type="text" id="symbol" value="AAPL" placeholder="輸入股票代碼 (如: 2330, 5347, NVDA)" style="width: 280px;">
+        <input type="text" id="symbol" value="AAPL" placeholder="輸入股票代碼 (如: 2330, NVDA)" style="width: 280px;">
         <button class="search-btn" onclick="updateChart(true)" title="搜尋股票">🔍</button>
 
         <div class="btn-group">
@@ -207,7 +227,6 @@
             return input.trim().toUpperCase().replace('.TWO', '').replace('.TW', '');
         }
 
-        // 🎯 核心大重構：確保所有 404 的上櫃/興櫃代碼被修正後，連同全域變數一起綁定！
         async function updateChart(isNewSearch = false) {
             const inputVal = document.getElementById('symbol').value;
             if (!inputVal.trim()) return;
@@ -221,10 +240,9 @@
                 let response = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
                 let resData = await response.json();
                 
-                // 🔥【重中之重】如果用 .TW 噴 404 或帶 error，立刻改換 .TWO
                 if ((response.status !== 200 || resData.error) && activeFinalTicker.includes('.TW')) {
                     console.log(`⚠️偵測到 ${activeFinalTicker} 撈取失敗，自動重試切換為上櫃市場格式 (.TWO)...`);
-                    activeFinalTicker = activeFinalTicker.replace('.TW', '.TWO'); // 更新全域定位代碼，讓定時器同步修正！
+                    activeFinalTicker = activeFinalTicker.replace('.TW', '.TWO'); 
                     response = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
                     resData = await response.json();
                 }
@@ -324,6 +342,8 @@
         function updateTopInfoPanel() {
             if (!rawData || rawData.length === 0) return;
             
+            // 如果十字線正指著某根 K 線，頂端資訊同步顯示該 K 線時間，否則顯示最後一根
+            const targetCandle = currentHoveredCandle || rawData[rawData.length - 1];
             const todayCandle = rawData[rawData.length - 1];
             const prevCandle = rawData.length > 1 ? rawData[rawData.length - 2] : todayCandle;
             const basePrice = prevCandle.close; 
@@ -332,7 +352,7 @@
             const priceChange = currentPrice - basePrice;
             const percentChange = basePrice !== 0 ? (priceChange / basePrice) * 100 : 0;
 
-            document.getElementById('info-date').innerText = todayCandle.time;
+            document.getElementById('info-date').innerText = targetCandle.time;
             
             const priceEl = document.getElementById('info-price');
             priceEl.innerText = currentPrice.toFixed(2);
@@ -351,6 +371,16 @@
                 priceEl.style.color = '#e1e2e6';
                 changeEl.style.color = '#e1e2e6';
             }
+        }
+
+        // 🎯 輔助函式：用來將原始 Volume 轉換為台股「張數」或美股「股數」字串
+        function formatVolumeUnit(vol, isTW) {
+            if (!vol) return '0';
+            if (isTW) {
+                let sheets = (vol / 1000).toFixed(2);
+                return `${Number(sheets).toLocaleString()} 張 (${vol.toLocaleString()} 股)`;
+            }
+            return `${vol.toLocaleString()} 股`;
         }
 
         function drawCanvasChart() {
@@ -387,6 +417,9 @@
             const startIndex = rawData.length - totalDisplay;
             const candleWidth = chartW / totalDisplay;
             let visibleData = rawData.slice(startIndex);
+
+            // 判斷當前標的是否為台股
+            const isTWStock = currentCompanyName.includes('[市]') || currentCompanyName.includes('[櫃]') || currentCompanyName.includes('[興]');
 
             let prices = [];
             visibleData.forEach(d => {
@@ -429,7 +462,11 @@
             let maxVol = Math.max(...visibleData.map(d => d.volume || 0));
             ctx.strokeStyle = '#232429';
             ctx.beginPath(); ctx.moveTo(0, volTop); ctx.lineTo(chartW, volTop); ctx.stroke();
-            ctx.fillStyle = '#70737d'; ctx.fillText(maxVol.toLocaleString(), chartW + 8, volTop + 12);
+            ctx.fillStyle = '#70737d'; 
+            
+            // 右側量能刻度也做相應換算提示
+            let topVolLabel = isTWStock ? `${Math.round(maxVol/1000)}張` : maxVol.toLocaleString();
+            ctx.fillText(topVolLabel, chartW + 8, volTop + 12);
 
             let macdValues = [];
             visibleData.forEach(d => {
@@ -525,7 +562,8 @@
                         ctx.fillStyle = '#44454a';
                         ctx.fillRect(chartW + 2, mouseY - 9, rightPadding - 4, 18);
                         ctx.fillStyle = '#ffffff'; ctx.font = '10px sans-serif';
-                        ctx.fillText(hoverVol.toLocaleString(), chartW + 5, mouseY + 4);
+                        let hoverVolStr = isTWStock ? `${(hoverVol/1000).toFixed(1)}張` : hoverVol.toLocaleString();
+                        ctx.fillText(hoverVolStr, chartW + 5, mouseY + 4);
                     }
                 } else if (mouseY >= macdTop && mouseY <= macdTop + macdH) {
                     let hoverMacd = ((macdTop + macdH/2 - mouseY) / (macdH / 2)) * maxMacd;
@@ -536,26 +574,33 @@
                 }
             }
 
+            // 🎯 2 & 3. 繪製左上角狀態數值（加上 K 線年月日與自適應張數/股數單位判定）
             if (currentHoveredCandle) {
                 const hData = currentHoveredCandle;
                 ctx.font = '12px sans-serif';
                 
                 let kColor = hData.close >= hData.open ? '#ff4a4a' : '#26a69a';
-                ctx.fillStyle = '#e1e2e6'; ctx.fillText('開:', 10, 20);
-                ctx.fillStyle = kColor;   ctx.fillText(hData.open.toFixed(2), 30, 20);
-                ctx.fillStyle = '#e1e2e6'; ctx.fillText('高:', 85, 20);
-                ctx.fillStyle = kColor;   ctx.fillText(hData.high.toFixed(2), 105, 20);
-                ctx.fillStyle = '#e1e2e6'; ctx.fillText('低:', 160, 20);
-                ctx.fillStyle = kColor;   ctx.fillText(hData.low.toFixed(2), 180, 20);
-                ctx.fillStyle = '#e1e2e6'; ctx.fillText('收:', 235, 20);
-                ctx.fillStyle = kColor;   ctx.fillText(hData.close.toFixed(2), 255, 20);
                 
-                ctx.fillStyle = '#ffb74d'; ctx.fillText(`MA5: ${hData.ma5 ? hData.ma5.toFixed(2) : '--'}`, 320, 20);
-                ctx.fillStyle = '#ba68c8'; ctx.fillText(`MA20: ${hData.ma20 ? hData.ma20.toFixed(2) : '--'}`, 410, 20);
-                ctx.fillStyle = '#4fc3f7'; ctx.fillText(`MA60: ${hData.ma60 ? hData.ma60.toFixed(2) : '--'}`, 505, 20);
+                // 數據最前方追加特定 K 線的完整時間
+                ctx.fillStyle = '#ffeb3b'; ctx.fillText(`📅 ${hData.time}`, 10, 20);
 
+                let startX = 130; // 挪動後續 O,H,L,C 的起點坐標，避免與黃色日期重疊
+                ctx.fillStyle = '#e1e2e6'; ctx.fillText('開:', startX, 20);
+                ctx.fillStyle = kColor;   ctx.fillText(hData.open.toFixed(2), startX + 20, 20);
+                ctx.fillStyle = '#e1e2e6'; ctx.fillText('高:', startX + 75, 20);
+                ctx.fillStyle = kColor;   ctx.fillText(hData.high.toFixed(2), startX + 95, 20);
+                ctx.fillStyle = '#e1e2e6'; ctx.fillText('低:', startX + 150, 20);
+                ctx.fillStyle = kColor;   ctx.fillText(hData.low.toFixed(2), startX + 170, 20);
+                ctx.fillStyle = '#e1e2e6'; ctx.fillText('收:', startX + 225, 20);
+                ctx.fillStyle = kColor;   ctx.fillText(hData.close.toFixed(2), startX + 245, 20);
+                
+                ctx.fillStyle = '#ffb74d'; ctx.fillText(`MA5: ${hData.ma5 ? hData.ma5.toFixed(2) : '--'}`, startX + 310, 20);
+                ctx.fillStyle = '#ba68c8'; ctx.fillText(`MA20: ${hData.ma20 ? hData.ma20.toFixed(2) : '--'}`, startX + 400, 20);
+                ctx.fillStyle = '#4fc3f7'; ctx.fillText(`MA60: ${hData.ma60 ? hData.ma60.toFixed(2) : '--'}`, startX + 495, 20);
+
+                // 成交量副圖標題換算
                 ctx.fillStyle = '#a1a4b0';
-                ctx.fillText(`成交量: ${hData.volume ? hData.volume.toLocaleString() : '0'}`, 10, volTop - 6);
+                ctx.fillText(`成交量: ${formatVolumeUnit(hData.volume, isTWStock)}`, 10, volTop - 6);
 
                 ctx.fillStyle = '#ffeb3b'; ctx.fillText(`DIF(快): ${hData.macd_dif ? hData.macd_dif.toFixed(3) : '--'}`, 10, macdTop - 6);
                 ctx.fillStyle = '#00e5ff'; ctx.fillText(`DEA(慢): ${hData.macd_dem ? hData.macd_dem.toFixed(3) : '--'}`, 130, macdTop - 6);
@@ -605,11 +650,13 @@
             mouseX = event.clientX - rect.left;
             mouseY = event.clientY - rect.top; 
             drawCanvasChart();
+            updateTopInfoPanel(); // 十字線滑動時，同步更新上方 info panel 的日期
         });
         canvas.addEventListener('mouseleave', () => {
             mouseX = -1; mouseY = -1; 
             currentHoveredCandle = rawData[rawData.length - 1]; 
             drawCanvasChart();
+            updateTopInfoPanel();
         });
         canvas.addEventListener('wheel', (event) => {
             event.preventDefault();
