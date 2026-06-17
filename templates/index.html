@@ -2,202 +2,116 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>Trading Terminal | Live</title>
+    <title>專業級美股/台股即時看盤系統</title>
     <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            background-color: #1c1d22;
-            color: #e1e2e6;
-            font-family: sans-serif;
-        }
-        /* 🎯 頂端品牌列：取代舊標題 */
-        .brand-header {
-            margin-bottom: 15px;
-        }
-        .main-title {
-            font-size: 20px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: #fff;
-        }
-        .sub-title {
-            font-size: 11px;
-            color: #70737d;
-            display: block;
-            margin-top: 2px;
-        }
-
-        .control-panel {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-        input, select {
-            background: #2a2b30;
-            border: 1px solid #44454a;
-            color: #e1e2e6;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        input:focus {
-            outline: 1px solid #2962ff;
-        }
-        
-        .search-btn {
-            background: #2962ff;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            padding: 9px 15px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-        .search-btn:hover { background: #1e4bd6; }
-        
-        .btn-group { display: flex; gap: 2px; margin-left: 10px; }
-        .btn-group button { background: #2a2b30; border: 1px solid #44454a; color: #e1e2e6; border-radius: 0; padding: 10px 12px; cursor: pointer; font-size: 14px;}
-        .btn-group button:first-child { border-radius: 4px 0 0 4px; }
-        .btn-group button:last-child { border-radius: 0 4px 4px 0; }
-        .btn-group button.active { background: #ff4a4a; border-color: #ff4a4a; font-weight: bold; }
-
-        .info-panel {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #141518;
-            padding: 12px 20px;
-            border: 1px solid #2d2e33;
-            border-bottom: none;
-            border-radius: 4px 4px 0 0;
-        }
-        .info-item { font-weight: bold; }
-        .company-text { color: #2962ff; font-size: 15px; }
-
-        .price-display-block {
-            font-size: 28px; 
-            font-weight: bold; 
-            font-family: monospace;
-            display: flex;
-            align-items: baseline;
-            gap: 12px;
-        }
-        .change-text {
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .main-content {
-            display: flex;
-            gap: 15px;
-            width: 100%;
-        }
-        .canvas-container {
-            flex: 1;
-            background-color: #141518;
-            border: 1px solid #2d2e33;
-            border-radius: 0 0 0 4px;
-        }
-        canvas {
-            display: block;
-            cursor: crosshair;
-        }
-
-        .sidebar {
-            width: 220px;
-            background-color: #141518;
-            border: 1px solid #2d2e33;
-            border-radius: 0 0 4px 0;
-            padding: 15px;
-            box-sizing: border-box;
-        }
-        .sidebar h3 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 15px;
-            color: #70737d;
-            border-bottom: 1px solid #2d2e33;
-            padding-bottom: 8px;
-        }
-        .history-list { list-style: none; padding: 0; margin: 0; }
-        .history-item {
-            padding: 10px; background: #1c1d22; border: 1px solid #2d2e33;
-            margin-bottom: 8px; border-radius: 4px; cursor: pointer;
-            text-align: center; font-weight: bold; transition: all 0.2s;
-            font-size: 13px;
-        }
-        .history-item:hover { background: #2962ff; border-color: #2962ff; color: #fff; }
-        .no-history { color: #5d606b; font-size: 13px; text-align: center; margin-top: 20px; font-style: italic; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #0b0c0e; color: #e1e2e6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+        .dashboard-container { display: flex; width: 100vw; height: 100vh; }
+        .sidebar { width: 280px; background-color: #141518; border-right: 1px solid #232429; display: flex; flex-direction: column; padding: 15px; }
+        .main-panel { flex: 1; display: flex; flex-direction: column; background-color: #0b0c0e; position: relative; }
+        .search-box { display: flex; gap: 8px; margin-bottom: 20px; }
+        .search-box input { flex: 1; background-color: #1e2024; border: 1px solid #2d3139; border-radius: 4px; color: #fff; padding: 10px; font-size: 14px; font-weight: bold; }
+        .search-box input:focus { border-color: #2962ff; outline: none; }
+        .search-box button { background-color: #2962ff; border: none; border-radius: 4px; color: #fff; cursor: pointer; padding: 0 16px; font-size: 14px; font-weight: bold; transition: 0.2s; }
+        .search-box button:hover { background-color: #1546d6; }
+        .history-title { font-size: 12px; color: #70737d; text-transform: uppercase; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; }
+        .history-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+        .history-item { padding: 10px; background-color: #1e2024; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; display: flex; justify-content: space-between; }
+        .history-item:hover { background-color: #2d3139; color: #fff; }
+        .no-history { font-size: 13px; color: #4e515c; text-align: center; margin-top: 10px; }
+        .stock-header { background-color: #141518; border-bottom: 1px solid #232429; height: 65px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+        .company-info { display: flex; flex-direction: column; }
+        .company-title { font-size: 18px; font-weight: bold; color: #fff; }
+        .price-panel { display: flex; align-items: baseline; gap: 12px; }
+        .current-price { font-size: 24px; font-weight: 800; font-family: monospace; }
+        .price-change { font-size: 14px; font-weight: bold; }
+        .control-bar { background-color: #141518; border-bottom: 1px solid #232429; height: 45px; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
+        .tabs { display: flex; gap: 5px; }
+        .tab-btn { background: none; border: none; color: #70737d; padding: 8px 16px; font-size: 13px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        .tab-btn:hover { color: #fff; }
+        .tab-btn.active { background-color: #1e2024; color: #2962ff; }
+        .periods { display: none; gap: 5px; }
+        .period-btn { background-color: #1e2024; border: 1px solid #2d3139; color: #a1a4b0; padding: 5px 10px; font-size: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .period-btn:hover { color: #fff; border-color: #4e515c; }
+        .period-btn.active { background-color: #2962ff; color: #fff; border-color: #2962ff; }
+        #refresh-status { font-size: 12px; color: #4e515c; font-family: monospace; display: flex; align-items: center; gap: 4px; }
+        .dot { width: 6px; height: 6px; background-color: #00e5ff; border-radius: 50%; display: inline-block; }
+        .chart-wrapper { flex: 1; width: 100%; position: relative; background-color: #141518; }
+        canvas { display: block; width: 100%; height: 100%; }
     </style>
 </head>
 <body>
 
-    <div class="brand-header">
-        <span class="main-title">MARKET TERMINAL</span>
-        <span class="sub-title">Real-time Analytics Subsystem</span>
-    </div>
-    
-    <div class="control-panel">
-        <input type="text" id="symbol" value="AAPL" placeholder="輸入股票代碼 (如: 2330, NVDA)" style="width: 280px;">
-        <button class="search-btn" onclick="updateChart(true)" title="搜尋股票">🔍</button>
-
-        <div class="btn-group">
-            <button id="btn-15m" onclick="changePeriod('15m')">15分</button>
-            <button id="btn-30m" onclick="changePeriod('30m')">30分</button>
-            <button id="btn-60m" onclick="changePeriod('60m')">60分</button>
-            <button id="btn-4h" onclick="changePeriod('4h')">4時</button>
-            <button id="btn-D" class="active" onclick="changePeriod('D')">日</button>
-            <button id="btn-W" onclick="changePeriod('W')">週</button>
-            <button id="btn-M" onclick="changePeriod('M')">月</button>
-        </div>
-    </div>
-
-    <div class="info-panel" id="infoPanel">
-        <div style="display: flex; gap: 30px; align-items: center;">
-            <div class="info-item company-text" style="font-size: 18px; color: #fff;"><span id="info-company">載入中...</span></div>
-            
-            <div class="price-display-block">
-                <span id="info-price">--.--</span>
-                <span id="info-change" class="change-text">--.-- (--%)</span>
-            </div>
-        </div>
-        
-        <div style="display: flex; gap: 20px; align-items: center; font-size: 13px; color: #70737d;">
-            <div>數據時間: <span id="info-date" style="color: #e1e2e6;">--</span></div>
-            <div id="refresh-status" style="color: #26a69a; font-weight: bold; transition: opacity 0.15s;">盤中自動追蹤中</div>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <div class="canvas-container">
-            <canvas id="stockCanvas" width="800" height="680"></canvas>
-        </div>
-        
+    <div class="dashboard-container">
         <div class="sidebar">
-            <h3>最近搜尋紀錄</h3>
+            <div class="search-box">
+                <input type="text" id="symbol" placeholder="輸入台股/美股代碼 (如: 2330, AAPL)" value="2330">
+                <button onclick="updateChart(true)">搜尋</button>
+            </div>
+            <div class="history-title">歷史搜尋紀錄</div>
             <ul class="history-list" id="historyList"></ul>
+        </div>
+        
+        <div class="main-panel">
+            <div class="stock-header">
+                <div class="company-info">
+                    <div id="info-company" class="company-title">載入中...</div>
+                </div>
+                <div class="price-panel">
+                    <div id="info-price" class="current-price">--</div>
+                    <div id="info-change" class="price-change">--</div>
+                </div>
+            </div>
+            
+            <div class="control-bar">
+                <!-- 在原本的 .tabs 裡面新增一個按鈕 -->
+                <div class="tabs">
+                    <button id="tab-intraday" class="tab-btn active" onclick="switchViewMode('intraday')">分時即時圖</button>
+                    <button id="tab-kline" class="tab-btn" onclick="switchViewMode('kline')">技術 K 線圖</button>
+                </div>
+                <div id="kline-periods" class="periods">
+                    <button id="btn-15m" class="period-btn" onclick="changePeriod('15m')">15分</button>
+                    <button id="btn-30m" class="period-btn" onclick="changePeriod('30m')">30分</button>
+                    <button id="btn-60m" class="period-btn" onclick="changePeriod('60m')">60分</button>
+                    <button id="btn-4h" class="period-btn" onclick="changePeriod('4h')">4小時</button>
+                    <button id="btn-D" class="period-btn active" onclick="changePeriod('D')">日K</button>
+                    <button id="btn-W" class="period-btn" onclick="changePeriod('W')">周K</button>
+                    <button id="btn-M" class="period-btn" onclick="changePeriod('M')">月K</button>
+                </div>
+                <div id="refresh-status"><span class="dot"></span>2ms 同步中</div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="stockCanvas"></canvas>
+            </div>
         </div>
     </div>
 
     <script>
+        let viewMode = 'intraday'; 
         let rawData = [];
+        let intradayData = { marketType: 'US', prevClose: 0, upLimit: null, downLimit: null, totalVolume: 0, points: [] };
         let displayCount = 80;
         let currentPeriod = 'D';
-        let mouseX = -1;
-        let mouseY = -1; 
-        let currentHoveredCandle = null; 
-        
-        let currentCompanyName = "";
-        let currentTickerLabel = "";
-        let activeFinalTicker = ""; 
-        
-        let priceRefreshInterval = null; 
+        let mouseX = -1; let mouseY = -1; 
+        let currentHoveredCandle = null; let currentHoveredPoint = null;
+        let currentCompanyName = ""; let currentTickerLabel = "";
+        let activeFinalTicker = ""; let priceRefreshInterval = null; 
+
+        function switchViewMode(mode) {
+    viewMode = mode;
+    document.getElementById('tab-intraday').classList.toggle('active', mode === 'intraday');
+    document.getElementById('tab-kline').classList.toggle('active', mode === 'kline');
+    
+    // 如果切換到營收，隱藏 K 線週期選擇器
+    document.getElementById('kline-periods').style.display = mode === 'kline' ? 'flex' : 'none';
+    
+    // 清除舊的畫布內容 (如果需要)
+    const canvas = document.getElementById('stockCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    updateChart(false);
+}
 
         function changePeriod(p) {
             currentPeriod = p;
@@ -205,21 +119,17 @@
                 document.getElementById(`btn-${per}`).classList.remove('active'); 
             });
             document.getElementById(`btn-${p}`).classList.add('active');
-            
             if (p.includes('m') || p === '4h') displayCount = 100;
             if (p === 'D') displayCount = 80;
             if (p === 'W') displayCount = 52;
             if (p === 'M') displayCount = 36;
-            
             updateChart(false);
         }
 
         function formatTickerForBackend(input) {
             let clean = input.trim().toUpperCase();
             clean = clean.replace('.TWO', '').replace('.TW', '');
-            if (/^\d+/.test(clean)) {
-                return clean + '.TW'; 
-            }
+            if (/^\d+/.test(clean)) { return clean + '.TW'; }
             return clean;
         }
 
@@ -231,84 +141,104 @@
             const inputVal = document.getElementById('symbol').value;
             if (!inputVal.trim()) return;
 
-            if (isNewSearch || !activeFinalTicker) {
-                activeFinalTicker = formatTickerForBackend(inputVal);
-            }
+            if (isNewSearch || !activeFinalTicker) { activeFinalTicker = formatTickerForBackend(inputVal); }
+            const currentOrigin = window.location.origin;
 
             try {
-                const currentOrigin = window.location.origin;
-                let response = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
-                let resData = await response.json();
-                
-                if ((response.status !== 200 || resData.error) && activeFinalTicker.includes('.TW')) {
-                    console.log(`⚠️偵測到 ${activeFinalTicker} 撈取失敗，自動重試切換為上櫃市場格式 (.TWO)...`);
+                let kResponse = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
+                let kData = await kResponse.json();
+
+                if ((kResponse.status !== 200 || kData.error) && activeFinalTicker.includes('.TW')) {
                     activeFinalTicker = activeFinalTicker.replace('.TW', '.TWO'); 
-                    response = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
-                    resData = await response.json();
+                    kResponse = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
+                    kData = await kResponse.json();
                 }
 
-                if (resData.error) {
-                    alert("資料載入失敗，此代碼可能不存在！");
-                    return;
-                }
+                if (kData.error) { alert("資料載入失敗，此代碼可能不存在！"); return; }
 
-                renderDataPayload(resData, inputVal, isNewSearch);
-            } catch (err) {
-                console.error("前端抓取失敗:", err);
+                currentCompanyName = kData.companyName; currentTickerLabel = kData.tickerLabel;
+                rawData = kData.candles;
+                document.getElementById('info-company').innerText = `${currentCompanyName} (${currentTickerLabel})`;
+                if (viewMode === 'revenue') {
+        try {
+            const response = await fetch(`${currentOrigin}/api/revenue?ticker=${activeFinalTicker}`);
+            
+            // 檢查 HTTP 狀態碼
+            if (!response.ok) {
+                throw new Error(`伺服器回應錯誤: ${response.status}`);
             }
-        }
-
-        function renderDataPayload(resData, inputVal, isNewSearch) {
-            currentCompanyName = resData.companyName;
-            currentTickerLabel = resData.tickerLabel;
-            rawData = resData.candles;
-
-            document.getElementById('info-company').innerText = `${currentCompanyName} (${currentTickerLabel})`;
-
-            calculateMA(5, 'ma5');
-            calculateMA(20, 'ma20');
-            calculateMA(60, 'ma60');
-            calculateMACD(); 
-
-            currentHoveredCandle = rawData[rawData.length - 1];
-            updateTopInfoPanel();
+            
+            window.revenueData = await response.json();
             drawCanvasChart();
+        } catch (error) {
+            console.error("前端抓取營收失敗:", error);
+            // 顯示一個提示給使用者，而不是讓程式崩潰
+            alert("營收資料暫時無法讀取，請稍後再試。");
+        }
+        return;
+    }
+                if (viewMode === 'kline') {
+                    calculateMA(5, 'ma5'); calculateMA(20, 'ma20'); calculateMA(60, 'ma60'); calculateMACD(); 
+                    currentHoveredCandle = rawData[rawData.length - 1];
+                } else {
+                    let intraRes = await fetch(`${currentOrigin}/api/intraday?ticker=${activeFinalTicker}`);
+                    let resJson = await intraRes.json();
+                    
+                    if (resJson.marketType === 'TW' && resJson.points) {
+                        resJson.points = resJson.points.filter(pt => {
+                            let hr = parseInt(pt.time.split(':')[0]);
+                            let mn = parseInt(pt.time.split(':')[1]);
+                            return (hr < 13) || (hr === 13 && mn <= 30);
+                        });
+                    }
+                    intradayData = resJson;
+                    if(intradayData.points && intradayData.points.length > 0) {
+                        currentHoveredPoint = intradayData.points[intradayData.points.length - 1];
+                    }
+                }
 
-            if (isNewSearch) { 
-                let isTW = currentCompanyName.includes('[市]') || currentCompanyName.includes('[櫃]') || currentCompanyName.includes('[興]');
-                saveToHistory(getCleanLogTicker(inputVal), isTW); 
-                document.getElementById('symbol').value = getCleanLogTicker(inputVal);
-            }
-            initAutoRefresh();
+                updateTopInfoPanel(); drawCanvasChart();
+
+                if (isNewSearch) { 
+                    let isTW = currentCompanyName.includes('[市]') || currentCompanyName.includes('[櫃]') || currentCompanyName.includes('[興]') || /^\d+/.test(currentTickerLabel);
+                    saveToHistory(getCleanLogTicker(inputVal), isTW); 
+                    document.getElementById('symbol').value = getCleanLogTicker(inputVal);
+                }
+                initAutoRefresh();
+            } catch (err) { console.error("前端抓取失敗:", err); }
         }
 
         function initAutoRefresh() {
             if (priceRefreshInterval) { clearInterval(priceRefreshInterval); }
-
             priceRefreshInterval = setInterval(async () => {
                 if (!activeFinalTicker) return;
-
                 const statusEl = document.getElementById('refresh-status');
-                statusEl.style.opacity = '0.3';
-                setTimeout(() => { statusEl.style.opacity = '1'; }, 150);
+                statusEl.style.opacity = '0.3'; setTimeout(() => { statusEl.style.opacity = '1'; }, 150);
 
                 try {
                     const currentOrigin = window.location.origin;
-                    const response = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
-                    const resData = await response.json();
-                    
-                    if (resData && Array.isArray(resData.candles) && resData.candles.length > 0) {
-                        rawData = resData.candles;
-                        calculateMA(5, 'ma5');
-                        calculateMA(20, 'ma20');
-                        calculateMA(60, 'ma60');
-                        calculateMACD(); 
-
-                        updateTopInfoPanel();
-                        drawCanvasChart();
+                    if (viewMode === 'kline') {
+                        const response = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
+                        const resData = await response.json();
+                        if (resData && Array.isArray(resData.candles)) {
+                            rawData = resData.candles;
+                            calculateMA(5, 'ma5'); calculateMA(20, 'ma20'); calculateMA(60, 'ma60'); calculateMACD(); 
+                        }
+                    } else {
+                        let intraRes = await fetch(`${currentOrigin}/api/intraday?ticker=${activeFinalTicker}`);
+                        let resJson = await intraRes.json();
+                        if (resJson.marketType === 'TW' && resJson.points) {
+                            resJson.points = resJson.points.filter(pt => {
+                                let hr = parseInt(pt.time.split(':')[0]);
+                                let mn = parseInt(pt.time.split(':')[1]);
+                                return (hr < 13) || (hr === 13 && mn <= 30);
+                            });
+                        }
+                        intradayData = resJson;
                     }
-                } catch (e) { console.log("自動刷新延遲...", e); }
-            }, 2000); 
+                    updateTopInfoPanel(); drawCanvasChart();
+                } catch (e) { console.log("自動同步中..."); }
+            }, 500); 
         }
 
         function calculateMACD() {
@@ -322,114 +252,434 @@
                     ema26 = close * k26 + ema26 * (1 - k26);
                 }
                 dif = ema12 - ema26;
-                if (i === 0) { dem9 = dif; } 
-                else { dem9 = dif * k9 + dem9 * (1 - k9); }
-                rawData[i].macd_dif = dif;  
-                rawData[i].macd_dem = dem9; 
-                rawData[i].macd_osc = (dif - dem9) * 2;  
+                if (i === 0) { dem9 = dif; } else { dem9 = dif * k9 + dem9 * (1 - k9); }
+                rawData[i].macd_dif = dif; rawData[i].macd_dem = dem9; rawData[i].macd_osc = (dif - dem9) * 2;  
             }
         }
 
         function calculateMA(period, keyName) {
             for (let i = 0; i < rawData.length; i++) {
                 if (i < period - 1) { rawData[i][keyName] = null; continue; }
-                let sum = 0;
-                for (let j = 0; j < period; j++) { sum += rawData[i - j].close; }
+                let sum = 0; for (let j = 0; j < period; j++) { sum += rawData[i - j].close; }
                 rawData[i][keyName] = sum / period;
             }
         }
 
         function updateTopInfoPanel() {
-            if (!rawData || rawData.length === 0) return;
-            
-            // 如果十字線正指著某根 K 線，頂端資訊同步顯示該 K 線時間，否則顯示最後一根
-            const targetCandle = currentHoveredCandle || rawData[rawData.length - 1];
-            const todayCandle = rawData[rawData.length - 1];
-            const prevCandle = rawData.length > 1 ? rawData[rawData.length - 2] : todayCandle;
-            const basePrice = prevCandle.close; 
-            
-            const currentPrice = todayCandle.close;
-            const priceChange = currentPrice - basePrice;
-            const percentChange = basePrice !== 0 ? (priceChange / basePrice) * 100 : 0;
-
-            document.getElementById('info-date').innerText = targetCandle.time;
-            
-            const priceEl = document.getElementById('info-price');
-            priceEl.innerText = currentPrice.toFixed(2);
-            
-            const changeEl = document.getElementById('info-change');
-            const sign = priceChange > 0 ? '+' : '';
-            changeEl.innerText = `${sign}${priceChange.toFixed(2)} (${sign}${percentChange.toFixed(2)}%)`;
-
-            if (priceChange > 0) {
-                priceEl.style.color = '#ff4a4a';
-                changeEl.style.color = '#ff4a4a';
-            } else if (priceChange < 0) {
-                priceEl.style.color = '#26a69a';
-                changeEl.style.color = '#26a69a';
+            if (viewMode === 'kline') {
+                if (!rawData || rawData.length === 0) return;
+                const todayCandle = rawData[rawData.length - 1];
+                const prevCandle = rawData.length > 1 ? rawData[rawData.length - 2] : todayCandle;
+                const basePrice = prevCandle.close; const currentPrice = todayCandle.close;
+                renderPriceColor(currentPrice, currentPrice - basePrice, basePrice !== 0 ? ((currentPrice - basePrice) / basePrice) * 100 : 0);
             } else {
-                priceEl.style.color = '#e1e2e6';
-                changeEl.style.color = '#e1e2e6';
+                if (!intradayData.points || intradayData.points.length === 0) return;
+                const lastPoint = intradayData.points[intradayData.points.length - 1];
+                const basePrice = intradayData.prevClose; const currentPrice = lastPoint.price;
+                renderPriceColor(currentPrice, currentPrice - basePrice, basePrice !== 0 ? ((currentPrice - basePrice) / basePrice) * 100 : 0);
             }
         }
 
-        // 🎯 輔助函式：用來將原始 Volume 轉換為台股「張數」或美股「股數」字串
+function renderPriceColor(price, change, percent) {
+            const priceEl = document.getElementById('info-price');
+            const changeEl = document.getElementById('info-change');
+            
+            // ── 🎯 核心修正：從全域變數 intradayData 取得真實漲跌停價 ──
+            // 如果後端有傳這兩個值，直接拿來比對，誤差小於 0.01 即視為觸及漲跌停
+            const upLimit = (typeof intradayData !== 'undefined') ? intradayData.upLimit : null;
+            const downLimit = (typeof intradayData !== 'undefined') ? intradayData.downLimit : null;
+            
+            const isLimitUp = upLimit ? (price >= upLimit - 0.01) : (percent >= 9.9);
+            const isLimitDown = downLimit ? (price <= downLimit + 0.01) : (percent <= -9.9);
+
+            // 更新文字內容
+            priceEl.innerText = price.toFixed(2);
+            const sign = change > 0 ? '+' : '';
+            changeEl.innerText = `${sign}${change.toFixed(2)} (${sign}${percent.toFixed(2)}%)`;
+
+            // 樣式設定
+            if (isLimitUp) {
+                // 漲停：紅底，文字強制反白 (符合你之前要求的紅底白字)
+                priceEl.style.backgroundColor = '#ff4a4a';
+                priceEl.style.color = '#ffffff'; 
+                
+                changeEl.style.color = '#ff4a4a'; // 漲幅文字依然維持紅色，不變白
+            } else if (isLimitDown) {
+                // 跌停：綠底，文字強制反白
+                priceEl.style.backgroundColor = '#26a69a';
+                priceEl.style.color = '#ffffff';
+                
+                changeEl.style.color = '#26a69a'; // 漲幅文字依然維持綠色，不變白
+            } else {
+                // 一般狀態：移除背景色，依照漲跌賦予文字顏色
+                priceEl.style.backgroundColor = 'transparent';
+                changeEl.style.backgroundColor = 'transparent';
+                
+                if (change > 0) {
+                    priceEl.style.color = '#ff4a4a';
+                    changeEl.style.color = '#ff4a4a';
+                } else if (change < 0) {
+                    priceEl.style.color = '#26a69a';
+                    changeEl.style.color = '#26a69a';
+                } else {
+                    priceEl.style.color = '#e1e2e6';
+                    changeEl.style.color = '#e1e2e6';
+                }
+            }
+        }
+
+        function simplifyVolumeValue(value) {
+            if (!value) return '0';
+            if (value >= 100000000) return (value / 100000000).toFixed(1) + '億';
+            if (value >= 10000) return (value / 10000).toFixed(1) + '萬';
+            return value.toFixed(0);
+        }
+
         function formatVolumeUnit(vol, isTW) {
             if (!vol) return '0';
             if (isTW) {
-                let sheets = (vol / 1000).toFixed(2);
-                return `${Number(sheets).toLocaleString()} 張 (${vol.toLocaleString()} 股)`;
+                let sheets = vol / 1000;
+                if (sheets >= 100000000) return (sheets / 100000000).toFixed(1) + '億張';
+                if (sheets >= 10000) return (sheets / 10000).toFixed(1) + '萬張';
+                return sheets.toFixed(1) + '張';
+            } else {
+                if (vol >= 100000000) return (vol / 100000000).toFixed(1) + '億股';
+                if (vol >= 10000) return (vol / 10000).toFixed(1) + '萬股';
+                return vol.toLocaleString() + '股';
             }
-            return `${vol.toLocaleString()} 股`;
         }
 
         function drawCanvasChart() {
-            const canvas = document.getElementById('stockCanvas');
-            const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById('stockCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.clientWidth; 
+    canvas.height = canvas.parentElement.clientHeight;
+    
+    if (viewMode === 'kline') { drawStandardKline(canvas, ctx); } 
+    else if (viewMode === 'revenue') { drawRevenueTable(ctx, canvas); } // 新增此行
+    else { drawIntradayTimeline(canvas, ctx); }
+}
+
+function drawTopLivePanel(ctx, activePoint, prevClose, isTW) {
+            if (!activePoint) return;
+            const diff = activePoint.price - prevClose;
+            const pct = prevClose !== 0 ? (diff / prevClose) * 100 : 0;
+            const sign = diff > 0 ? '+' : '';
             
-            canvas.width = canvas.parentElement.clientWidth;
-            const width = canvas.width;
-            const height = canvas.height;
-            const rightPadding = 80;
-            const chartW = width - rightPadding;
+            let statusColor = '#ffffff';
+            if (activePoint.price > prevClose) statusColor = '#ff4a4a';
+            else if (activePoint.price < prevClose) statusColor = '#26a69a';
 
-            const mainH = height * 0.50; 
-            const volH = height * 0.16;  
-            const macdH = height * 0.18; 
+            ctx.font = '12px sans-serif';
+            let currentX = 10;
+
+            ctx.fillStyle = '#e1e2e6';
+            ctx.fillText(`${activePoint.time}`, currentX, 20);
+            currentX += ctx.measureText(`${activePoint.time}`).width + 15;
+
+            ctx.fillStyle = '#e1e2e6';
+            ctx.fillText('價:', currentX, 20);
+            currentX += ctx.measureText('價:').width + 5;
             
-            const volTop = mainH + height * 0.04; 
-            const macdTop = volTop + volH + height * 0.04;
+            // 1. 設定文字內容
+            const priceStr = activePoint.price.toFixed(2);
+            const changeStr = `${sign}${diff.toFixed(2)}(${sign}${pct.toFixed(2)}%)`;
+            
+            // 2. 測量寬度
+            const priceW = ctx.measureText(priceStr).width;
+            const changeW = ctx.measureText(changeStr).width;
+            
+            // 3. 漲跌停狀態判定 (優先使用後端傳入的精確限制，無資料時才用 9.9% 補位)
+            const upLimit = (typeof intradayData !== 'undefined') ? intradayData.upLimit : null;
+            const downLimit = (typeof intradayData !== 'undefined') ? intradayData.downLimit : null;
+            
+            const isLimitUp = isTW && (upLimit ? (activePoint.price >= upLimit - 0.01) : (pct >= 9.9));
+            const isLimitDown = isTW && (downLimit ? (activePoint.price <= downLimit + 0.01) : (pct <= -9.9));
+            
+            // 4. 繪製背景色塊 (只有漲跌停時才畫)
+            if (isLimitUp) {
+                ctx.fillStyle = '#ff4a4a';
+                ctx.fillRect(currentX - 2, 5, priceW + 4, 20); // 紅色底色塊
+            } else if (isLimitDown) {
+                ctx.fillStyle = '#26a69a';
+                ctx.fillRect(currentX - 2, 5, priceW + 4, 20); // 綠色底色塊
+            }
 
-            ctx.fillStyle = '#141518';
-            ctx.fillRect(0, 0, width, height);
+            // 5. 繪製價格數字
+            // 若是漲跌停，文字強制變白；否則使用原本的狀態色
+            ctx.fillStyle = (isLimitUp || isLimitDown) ? '#ffffff' : statusColor;
+            ctx.fillText(priceStr, currentX, 20);
+            currentX += priceW + 10; // 價格與漲幅之間的間距
 
+            // 6. 繪製漲幅文字 (維持原本的狀態色，絕對不變白)
+            ctx.fillStyle = statusColor; 
+            ctx.fillText(changeStr, currentX, 20);
+            currentX += changeW + 20;
+            
+            ctx.fillStyle = '#e1e2e6';
+            ctx.fillText('均:', currentX, 20);
+            currentX += ctx.measureText('均:').width + 4;
+            ctx.fillStyle = '#ffb74d';
+            ctx.fillText(activePoint.avg_price.toFixed(2), currentX, 20);
+            currentX += ctx.measureText(activePoint.avg_price.toFixed(2)).width + 20;
+
+            ctx.fillStyle = '#a1a4b0';
+            let sVolStr = `單量: ${formatVolumeUnit(activePoint.volume, isTW)}`;
+            ctx.fillText(sVolStr, currentX, 20);
+            currentX += ctx.measureText(sVolStr).width + 15;
+            
+            let tVolStr = `總量: ${formatVolumeUnit(intradayData.totalVolume, isTW)}`;
+            ctx.fillText(tVolStr, currentX, 20);
+        }
+
+// 📈 視圖 A：分時走勢圖（台股漲跌停限制 vs 美股自適應對稱 + 右上角狀態底色）
+        function drawIntradayTimeline(canvas, ctx) {
+            const width = canvas.width; const height = canvas.height;
+            const padding = { top: 45, bottom: 40, left: 15, right: 85 };
+            const chartW = width - padding.left - padding.right;
+            const chartH = height - padding.top - padding.bottom;
+
+            ctx.fillStyle = '#141518'; ctx.fillRect(0, 0, width, height);
+            
+            if (!intradayData.points || intradayData.points.length === 0) return;
+            const rawPoints = intradayData.points;
+            const prevClose = intradayData.prevClose;
+            const isTW = intradayData.marketType === 'TW';
+
+            const totalSlots = isTW ? 270 : 390;
+            const stepX = chartW / totalSlots;
+
+            // ── 📊 核心邏輯：台股固定漲跌停 vs 美股動態自適應對稱 ──
+            let maxPrice = intradayData.upLimit;
+            let minPrice = intradayData.downLimit;
+
+            let points = [];
+
+if (rawPoints.length > 0) {
+    // 1. 先把第一筆加入
+    points.push(rawPoints[0]);
+    
+    // 2. 遍歷原始點，如果發現時間差距 > 1 分鐘，則進行補點
+    for (let i = 0; i < rawPoints.length - 1; i++) {
+        let current = new Date(`2026-06-17 ${rawPoints[i].time}:00`);
+        let next = new Date(`2026-06-17 ${rawPoints[i+1].time}:00`);
+        let diffMinutes = (next - current) / (1000 * 60);
+        
+        // 如果中間有空缺 (例如 24 分跳到 30 分)
+        if (diffMinutes > 1) {
+            for (let m = 1; m < diffMinutes; m++) {
+                let fillTime = new Date(current.getTime() + m * 60000);
+                points.push({
+                    time: fillTime.getHours().toString().padStart(2, '0') + ':' + 
+                          fillTime.getMinutes().toString().padStart(2, '0'),
+                    price: rawPoints[i].price, // 沿用前一筆價格
+                    volume: 0,                 // 成交量設為 0
+                    avg_price: rawPoints[i].avg_price
+                });
+            }
+        }
+        points.push(rawPoints[i+1]);
+    }
+}
+
+            if (!isTW || !maxPrice || !minPrice || minPrice === maxPrice) {
+                // 美股或無漲跌停數據：找出今日最高與最低，計算與平盤的最大偏離度，做出完美對稱
+                const prices = points.map(p => p.price);
+                const highest = Math.max(...prices, prevClose);
+                const lowest = Math.min(...prices, prevClose);
+                const maxDiff = Math.max(Math.abs(highest - prevClose), Math.abs(prevClose - lowest));
+                // 加上 2% 的留白緩衝，避免線貼到邊緣
+                const buffer = maxDiff > 0 ? maxDiff * 1.02 : prevClose * 0.02; 
+                maxPrice = prevClose + buffer;
+                minPrice = prevClose - buffer;
+            }
+
+            const getPriceY = (p) => {
+                const ratio = (p - minPrice) / (maxPrice - minPrice);
+                return padding.top + chartH - (ratio * chartH);
+            };
+
+            const yPrevClose = getPriceY(prevClose);
+            ctx.lineWidth = 1; ctx.font = 'bold 12px monospace';
+
+            // ── 🎨 右側刻度標籤繪製 ──
+            const drawScaleLabel = (price, y, type) => {
+                let text = price.toFixed(2);
+                let textColor = '#ffffff'; let bgColor = null;
+
+                // 只有台股（isTW 為 true）且真正觸及漲跌停界線時，才使用紅底白字/綠底白字
+                if (isTW && type === 'up') { bgColor = '#ff4a4a'; }
+                else if (isTW && type === 'down') { bgColor = '#26a69a'; }
+                else if (type === 'flat') { bgColor = '#2962ff'; } 
+                else { 
+                    // 美股或中間等分線，一律不上底色，純用文字顏色區分漲跌
+                    textColor = price >= prevClose ? '#ff4a4a' : '#26a69a'; 
+                }
+
+                ctx.strokeStyle = '#232429';
+                if (type === 'flat') {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                    ctx.setLineDash([4, 4]); // 平盤線：白色虛線
+                } else {
+                    ctx.setLineDash([]);
+                }
+                ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(padding.left + chartW, y); ctx.stroke();
+                ctx.setLineDash([]);
+
+                if (bgColor) {
+                    ctx.fillStyle = bgColor;
+                    ctx.fillRect(padding.left + chartW + 4, y - 9, padding.right - 8, 18);
+                    ctx.fillStyle = '#ffffff';
+                } else {
+                    ctx.fillStyle = textColor;
+                }
+                ctx.fillText(text, padding.left + chartW + 10, y + 4);
+            };
+
+            // 繪製五條基準線
+            drawScaleLabel(maxPrice, getPriceY(maxPrice), 'up');
+            drawScaleLabel(prevClose + (maxPrice - prevClose) * 0.5, getPriceY(prevClose + (maxPrice - prevClose) * 0.5), 'upper-text');
+            drawScaleLabel(prevClose, yPrevClose, 'flat');
+            drawScaleLabel(minPrice + (prevClose - minPrice) * 0.5, getPriceY(minPrice + (prevClose - minPrice) * 0.5), 'lower-text');
+            drawScaleLabel(minPrice, getPriceY(minPrice), 'down');
+
+            // 時間網格標籤
+            ctx.fillStyle = '#70737d'; ctx.font = '11px sans-serif';
+            const timeLabels = isTW ? ['09:00', '10:00', '11:00', '12:00', '13:00', '13:30'] : ['09:30', '11:00', '13:00', '15:00', '16:00'];
+            
+            timeLabels.forEach((label, i) => {
+                let slotIndex = 0;
+                if (isTW) {
+                    if (label === '09:00') slotIndex = 0;
+                    else if (label === '10:00') slotIndex = 60;
+                    else if (label === '11:00') slotIndex = 120;
+                    else if (label === '12:00') slotIndex = 180;
+                    else if (label === '13:00') slotIndex = 240;
+                    else if (label === '13:30') slotIndex = 270;
+                } else {
+                    if (label === '09:30') slotIndex = 0;
+                    else if (label === '11:00') slotIndex = 90;
+                    else if (label === '13:00') slotIndex = 210;
+                    else if (label === '15:00') slotIndex = 330;
+                    else if (label === '16:00') slotIndex = 390;
+                }
+                let posX = padding.left + (slotIndex * stepX);
+                ctx.strokeStyle = '#1f2024';
+                ctx.beginPath(); ctx.moveTo(posX, padding.top); ctx.lineTo(posX, padding.top + chartH); ctx.stroke();
+                if (i === timeLabels.length - 1) {
+                    ctx.fillText(label, posX - 30, padding.top + chartH + 18);
+                } else {
+                    ctx.fillText(label, posX - 15, padding.top + chartH + 18);
+                }
+            });
+
+            // 🎯 區間雙色路徑與透明面積填滿
+            ctx.save();
+            let linePath = new Path2D();
+            points.forEach((p, idx) => {
+                let cx = padding.left + (idx * stepX);
+                let cy = getPriceY(p.price);
+                if (idx === 0) linePath.moveTo(cx, cy); else linePath.lineTo(cx, cy);
+            });
+
+            // 🔴 上半部 (平盤以上)：紅色線 + 透明紅填滿
+            ctx.save();
+            ctx.beginPath(); ctx.rect(padding.left, padding.top, chartW, yPrevClose - padding.top); ctx.clip();
+            if(points.length > 0) {
+                let fillPathUp = new Path2D(); fillPathUp.moveTo(padding.left, yPrevClose);
+                points.forEach((p, idx) => { fillPathUp.lineTo(padding.left + (idx * stepX), getPriceY(p.price)); });
+                fillPathUp.lineTo(padding.left + ((points.length - 1) * stepX), yPrevClose); fillPathUp.closePath();
+                ctx.fillStyle = 'rgba(255, 74, 74, 0.08)'; ctx.fill(fillPathUp);
+            }
+            ctx.lineWidth = 2; ctx.strokeStyle = '#ff4a4a'; ctx.stroke(linePath);
+            ctx.restore();
+
+            // 🟢 下半部 (平盤以下)：綠色線 + 透明綠填滿
+            ctx.save();
+            ctx.beginPath(); ctx.rect(padding.left, yPrevClose, chartW, padding.top + chartH - yPrevClose); ctx.clip();
+            if(points.length > 0) {
+                let fillPathDown = new Path2D(); fillPathDown.moveTo(padding.left, yPrevClose);
+                points.forEach((p, idx) => { fillPathDown.lineTo(padding.left + (idx * stepX), getPriceY(p.price)); });
+                fillPathDown.lineTo(padding.left + ((points.length - 1) * stepX), yPrevClose); fillPathDown.closePath();
+                ctx.fillStyle = 'rgba(38, 166, 154, 0.08)'; ctx.fill(fillPathDown);
+            }
+            ctx.lineWidth = 2; ctx.strokeStyle = '#26a69a'; ctx.stroke(linePath);
+            ctx.restore();
+            ctx.restore(); 
+
+            // 繪製黃色均價線
+            ctx.strokeStyle = '#ffb74d'; ctx.lineWidth = 1.5; ctx.beginPath();
+            points.forEach((p, idx) => {
+                let cx = padding.left + (idx * stepX); let cy = getPriceY(p.avg_price);
+                if (idx === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+            });
+            ctx.stroke();
+
+            // 底部成交量
+            const volH = chartH * 0.15; const volTop = padding.top + chartH - volH;
+            let maxVol = Math.max(...points.map(p => p.volume)) || 1;
+            points.forEach((p, idx) => {
+                let cx = padding.left + (idx * stepX); let vH = (p.volume / maxVol) * volH;
+                ctx.fillStyle = p.price >= prevClose ? 'rgba(255, 74, 74, 0.4)' : 'rgba(38, 166, 154, 0.4)';
+                ctx.fillRect(cx, volTop + volH - vH, Math.max(stepX * 0.6, 1), vH);
+            });
+
+            // 探針互動 & 右上角即時價/探針價動態背景色
+            let activePointToShow = null;
+            let isHovering = mouseX >= padding.left && mouseX <= padding.left + chartW && mouseY >= padding.top && mouseY <= padding.top + chartH;
+            let hoverPrice = 0;
+
+            if (isHovering) {
+                let hoverIdx = Math.floor((mouseX - padding.left) / stepX);
+                if (hoverIdx >= 0 && hoverIdx < points.length) {
+                    activePointToShow = points[hoverIdx];
+                    hoverPrice = maxPrice - ((mouseY - padding.top) / chartH) * (maxPrice - minPrice);
+                    let finalLineX = padding.left + (hoverIdx * stepX);
+
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+                    ctx.beginPath(); ctx.moveTo(finalLineX, padding.top); ctx.lineTo(finalLineX, padding.top + chartH); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(padding.left, mouseY); ctx.lineTo(padding.left + chartW, mouseY); ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // 繪製滑鼠所在位置的右側刻度標籤
+                    ctx.fillStyle = '#1e2024'; ctx.fillRect(padding.left + chartW + 4, mouseY - 9, padding.right - 8, 18);
+                    ctx.fillStyle = hoverPrice >= prevClose ? '#ff4a4a' : '#26a69a';
+                    ctx.fillText(hoverPrice.toFixed(2), padding.left + chartW + 10, mouseY + 4);
+                }
+            }
+
+            if (!activePointToShow && points.length > 0) activePointToShow = points[points.length - 1];
+            
+            // 呼叫頂部面板繪製
+            drawTopLivePanel(ctx, activePointToShow, prevClose, isTW);
+        }
+
+        // 📊 視圖 B：技術 K 線圖
+        function drawStandardKline(canvas, ctx) {
+            const width = canvas.width; const height = canvas.height;
+            const rightPadding = 80; const chartW = width - rightPadding;
+            const mainH = height * 0.50; const volH = height * 0.16; const macdH = height * 0.18; 
+            const volTop = mainH + height * 0.04; const macdTop = volTop + volH + height * 0.04;
+
+            ctx.fillStyle = '#141518'; ctx.fillRect(0, 0, width, height);
             if (rawData.length === 0) return;
 
-            ctx.save();
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.025)'; 
-            ctx.font = 'bold 36px sans-serif';
+            ctx.save(); ctx.fillStyle = 'rgba(255, 255, 255, 0.025)'; ctx.font = 'bold 36px sans-serif';
             ctx.fillText(`${currentTickerLabel}`, 20, mainH - 60);
-            ctx.font = 'bold 20px sans-serif';
-            ctx.fillText(`${currentCompanyName}`, 20, mainH - 30);
-            ctx.restore();
+            ctx.fillText(`${currentCompanyName}`, 20, mainH - 30); ctx.restore();
 
             const totalDisplay = Math.min(rawData.length, displayCount);
             const startIndex = rawData.length - totalDisplay;
             const candleWidth = chartW / totalDisplay;
             let visibleData = rawData.slice(startIndex);
-
-            // 判斷當前標的是否為台股
-            const isTWStock = currentCompanyName.includes('[市]') || currentCompanyName.includes('[櫃]') || currentCompanyName.includes('[興]');
+            const isTWStock = currentCompanyName.includes('[市]') || currentCompanyName.includes('[櫃]') || currentCompanyName.includes('[興]') || /^\d+/.test(currentTickerLabel);
 
             let prices = [];
             visibleData.forEach(d => {
                 prices.push(d.high, d.low);
-                if(d.ma5) prices.push(d.ma5);
-                if(d.ma20) prices.push(d.ma20);
-                if(d.ma60) prices.push(d.ma60);
+                if(d.ma5) prices.push(d.ma5); if(d.ma20) prices.push(d.ma20); if(d.ma60) prices.push(d.ma60);
             });
-            let maxPrice = Math.max(...prices);
-            let minPrice = Math.min(...prices);
+            let maxPrice = Math.max(...prices); let minPrice = Math.min(...prices);
             let priceRange = maxPrice - minPrice;
             maxPrice += priceRange * 0.05; minPrice -= priceRange * 0.05;
             let adjustedRange = maxPrice - minPrice;
@@ -438,19 +688,15 @@
 
             ctx.strokeStyle = '#232429'; ctx.lineWidth = 1;
             for (let i = 1; i < 4; i++) {
-                let y = (mainH / 4) * i;
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(chartW, y); ctx.stroke();
+                let y = (mainH / 4) * i; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(chartW, y); ctx.stroke();
                 ctx.fillStyle = '#70737d'; ctx.font = '11px sans-serif';
-                let priceLabel = maxPrice - (adjustedRange / 4) * i;
-                ctx.fillText(priceLabel.toFixed(2), chartW + 8, y + 4);
+                let priceLabel = maxPrice - (adjustedRange / 4) * i; ctx.fillText(priceLabel.toFixed(2), chartW + 8, y + 4);
             }
 
             const drawMALine = (keyName, color) => {
-                ctx.strokeStyle = color; ctx.lineWidth = 1.2; ctx.beginPath();
-                let started = false;
+                ctx.strokeStyle = color; ctx.lineWidth = 1.2; ctx.beginPath(); let started = false;
                 for (let i = 0; i < totalDisplay; i++) {
-                    const data = rawData[startIndex + i];
-                    if (!data[keyName]) continue;
+                    const data = rawData[startIndex + i]; if (!data[keyName]) continue;
                     let cx = i * candleWidth + candleWidth/2;
                     if (!started) { ctx.moveTo(cx, getPriceY(data[keyName])); started = true; } 
                     else { ctx.lineTo(cx, getPriceY(data[keyName])); }
@@ -460,12 +706,9 @@
             drawMALine('ma5', '#ffb74d'); drawMALine('ma20', '#ba68c8'); drawMALine('ma60', '#4fc3f7');
 
             let maxVol = Math.max(...visibleData.map(d => d.volume || 0));
-            ctx.strokeStyle = '#232429';
-            ctx.beginPath(); ctx.moveTo(0, volTop); ctx.lineTo(chartW, volTop); ctx.stroke();
-            ctx.fillStyle = '#70737d'; 
-            
-            // 右側量能刻度也做相應換算提示
-            let topVolLabel = isTWStock ? `${Math.round(maxVol/1000)}張` : maxVol.toLocaleString();
+            ctx.strokeStyle = '#232429'; ctx.beginPath(); ctx.moveTo(0, volTop); ctx.lineTo(chartW, volTop); ctx.stroke();
+            ctx.fillStyle = '#70737d';
+            let topVolLabel = isTWStock ? simplifyVolumeValue(maxVol / 1000) + '張' : simplifyVolumeValue(maxVol) + '股';
             ctx.fillText(topVolLabel, chartW + 8, volTop + 12);
 
             let macdValues = [];
@@ -474,29 +717,20 @@
                 if(d.macd_dif) macdValues.push(Math.abs(d.macd_dif));
                 if(d.macd_dem) macdValues.push(Math.abs(d.macd_dem));
             });
-            let maxMacd = Math.max(...macdValues) || 1;
-            maxMacd *= 1.05;
+            let maxMacd = Math.max(...macdValues) || 1; maxMacd *= 1.05;
 
-            ctx.strokeStyle = '#38393e';
-            ctx.beginPath(); ctx.moveTo(0, macdTop + macdH/2); ctx.lineTo(chartW, macdTop + macdH/2); ctx.stroke();
-            ctx.fillStyle = '#70737d';
-            ctx.fillText(maxMacd.toFixed(2), chartW + 8, macdTop + 12);
-            ctx.fillText((-maxMacd).toFixed(2), chartW + 8, macdTop + macdH);
+            ctx.strokeStyle = '#38393e'; ctx.beginPath(); ctx.moveTo(0, macdTop + macdH/2); ctx.lineTo(chartW, macdTop + macdH/2); ctx.stroke();
+            ctx.fillStyle = '#70737d'; ctx.fillText(maxMacd.toFixed(2), chartW + 8, macdTop + 12); ctx.fillText((-maxMacd).toFixed(2), chartW + 8, macdTop + macdH);
 
             const getMacdY = (val) => (macdTop + macdH/2) - (val / maxMacd) * (macdH / 2);
-
-            let hoveredCandleIndex = -1;
-            let finalLineX = -1;
+            let hoveredCandleIndex = -1; let finalLineX = -1;
 
             for (let i = 0; i < totalDisplay; i++) {
                 const data = rawData[startIndex + i];
-                const x = i * candleWidth + (candleWidth * 0.1);
-                const w = candleWidth * 0.8;
-                const isUp = data.close >= data.open;
-                const color = isUp ? '#ff4a4a' : '#26a69a';
+                const x = i * candleWidth + (candleWidth * 0.1); const w = candleWidth * 0.8;
+                const isUp = data.close >= data.open; const color = isUp ? '#ff4a4a' : '#26a69a';
 
                 ctx.strokeStyle = color; ctx.fillStyle = color;
-
                 const yOpen = getPriceY(data.open); const yClose = getPriceY(data.close);
                 ctx.beginPath(); ctx.moveTo(x + w / 2, getPriceY(data.high)); ctx.lineTo(x + w / 2, getPriceY(data.low)); ctx.stroke();
                 ctx.fillRect(x, Math.min(yOpen, yClose), w, Math.abs(yOpen - yClose) || 2);
@@ -505,19 +739,16 @@
                 ctx.fillStyle = isUp ? 'rgba(255, 74, 74, 0.45)' : 'rgba(38, 166, 154, 0.45)';
                 ctx.fillRect(x, volTop + volH - vH, w, vH);
 
-                const yZero = macdTop + macdH/2;
-                const yOsc = getMacdY(data.macd_osc);
+                const yZero = macdTop + macdH/2; const yOsc = getMacdY(data.macd_osc);
                 ctx.fillStyle = data.macd_osc >= 0 ? 'rgba(255, 74, 74, 0.75)' : 'rgba(38, 166, 154, 0.75)';
                 ctx.fillRect(x, Math.min(yZero, yOsc), w, Math.abs(yZero - yOsc) || 1);
 
                 if (mouseX >= i * candleWidth && mouseX < (i + 1) * candleWidth) {
-                    hoveredCandleIndex = startIndex + i;
-                    finalLineX = x + w / 2;
+                    hoveredCandleIndex = startIndex + i; finalLineX = x + w / 2;
                 }
             }
 
-            ctx.strokeStyle = '#ffeb3b'; ctx.lineWidth = 1.5; ctx.beginPath();
-            let difStarted = false;
+            ctx.strokeStyle = '#ffeb3b'; ctx.lineWidth = 1.5; ctx.beginPath(); let difStarted = false;
             for (let i = 0; i < totalDisplay; i++) {
                 const data = rawData[startIndex + i]; if (data.macd_dif === undefined) continue;
                 if (!difStarted) { ctx.moveTo(i * candleWidth + candleWidth/2, getMacdY(data.macd_dif)); difStarted = true; } 
@@ -525,8 +756,7 @@
             }
             ctx.stroke();
 
-            ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 1.5; ctx.beginPath();
-            let deaStarted = false;
+            ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 1.5; ctx.beginPath(); let deaStarted = false;
             for (let i = 0; i < totalDisplay; i++) {
                 const data = rawData[startIndex + i]; if (data.macd_dem === undefined) continue;
                 if (!deaStarted) { ctx.moveTo(i * candleWidth + candleWidth/2, getMacdY(data.macd_dem)); deaStarted = true; } 
@@ -534,80 +764,45 @@
             }
             ctx.stroke();
 
-            if (hoveredCandleIndex !== -1) {
-                currentHoveredCandle = rawData[hoveredCandleIndex];
-            }
+            if (hoveredCandleIndex !== -1) { currentHoveredCandle = rawData[hoveredCandleIndex]; }
 
             if (mouseX >= 0 && mouseX <= chartW && mouseY >= 0 && mouseY <= height) {
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([4, 4]);
-
-                if (finalLineX !== -1) {
-                    ctx.beginPath(); ctx.moveTo(finalLineX, 0); ctx.lineTo(finalLineX, height); ctx.stroke();
-                }
-
-                ctx.beginPath(); ctx.moveTo(0, mouseY); ctx.lineTo(chartW, mouseY); ctx.stroke();
-                ctx.setLineDash([]);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+                if (finalLineX !== -1) { ctx.beginPath(); ctx.moveTo(finalLineX, 0); ctx.lineTo(finalLineX, height); ctx.stroke(); }
+                ctx.beginPath(); ctx.moveTo(0, mouseY); ctx.lineTo(chartW, mouseY); ctx.stroke(); ctx.setLineDash([]);
 
                 if (mouseY <= mainH) {
                     let hoverPrice = maxPrice - (mouseY / mainH) * adjustedRange;
-                    ctx.fillStyle = '#2962ff';
-                    ctx.fillRect(chartW + 2, mouseY - 9, rightPadding - 4, 18);
-                    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px sans-serif';
-                    ctx.fillText(hoverPrice.toFixed(2), chartW + 8, mouseY + 4);
-                } else if (mouseY >= volTop && mouseY <= volTop + volH) {
-                    let hoverVol = Math.round(((volTop + volH - mouseY) / volH) * maxVol);
-                    if (hoverVol >= 0) {
-                        ctx.fillStyle = '#44454a';
-                        ctx.fillRect(chartW + 2, mouseY - 9, rightPadding - 4, 18);
-                        ctx.fillStyle = '#ffffff'; ctx.font = '10px sans-serif';
-                        let hoverVolStr = isTWStock ? `${(hoverVol/1000).toFixed(1)}張` : hoverVol.toLocaleString();
-                        ctx.fillText(hoverVolStr, chartW + 5, mouseY + 4);
-                    }
-                } else if (mouseY >= macdTop && mouseY <= macdTop + macdH) {
-                    let hoverMacd = ((macdTop + macdH/2 - mouseY) / (macdH / 2)) * maxMacd;
-                    ctx.fillStyle = '#ba68c8';
-                    ctx.fillRect(chartW + 2, mouseY - 9, rightPadding - 4, 18);
-                    ctx.fillStyle = '#ffffff'; ctx.font = '11px sans-serif';
-                    ctx.fillText(hoverMacd.toFixed(3), chartW + 8, mouseY + 4);
+                    ctx.fillStyle = '#2962ff'; ctx.fillRect(chartW + 2, mouseY - 9, rightPadding - 4, 18);
+                    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px sans-serif'; ctx.fillText(hoverPrice.toFixed(2), chartW + 8, mouseY + 4);
                 }
             }
 
-            // 🎯 2 & 3. 繪製左上角狀態數值（加上 K 線年月日與自適應張數/股數單位判定）
             if (currentHoveredCandle) {
-                const hData = currentHoveredCandle;
-                ctx.font = '12px sans-serif';
-                
+                const hData = currentHoveredCandle; ctx.font = '12px sans-serif';
                 let kColor = hData.close >= hData.open ? '#ff4a4a' : '#26a69a';
-                
-                // 數據最前方追加特定 K 線的完整時間
-                ctx.fillStyle = '#ffeb3b'; ctx.fillText(`📅 ${hData.time}`, 10, 20);
+                ctx.fillStyle = '#e1e2e6'; ctx.fillText(`${hData.time}`, 10, 20);
 
-                let startX = 130; // 挪動後續 O,H,L,C 的起點坐標，避免與黃色日期重疊
+                let startX = 110;
                 ctx.fillStyle = '#e1e2e6'; ctx.fillText('開:', startX, 20);
-                ctx.fillStyle = kColor;   ctx.fillText(hData.open.toFixed(2), startX + 20, 20);
+                ctx.fillStyle = kColor; ctx.fillText(hData.open.toFixed(2), startX + 20, 20);
                 ctx.fillStyle = '#e1e2e6'; ctx.fillText('高:', startX + 75, 20);
-                ctx.fillStyle = kColor;   ctx.fillText(hData.high.toFixed(2), startX + 95, 20);
+                ctx.fillStyle = kColor; ctx.fillText(hData.high.toFixed(2), startX + 95, 20);
                 ctx.fillStyle = '#e1e2e6'; ctx.fillText('低:', startX + 150, 20);
-                ctx.fillStyle = kColor;   ctx.fillText(hData.low.toFixed(2), startX + 170, 20);
+                ctx.fillStyle = kColor; ctx.fillText(hData.low.toFixed(2), startX + 170, 20);
                 ctx.fillStyle = '#e1e2e6'; ctx.fillText('收:', startX + 225, 20);
-                ctx.fillStyle = kColor;   ctx.fillText(hData.close.toFixed(2), startX + 245, 20);
+                ctx.fillStyle = kColor; ctx.fillText(hData.close.toFixed(2), startX + 245, 20);
                 
                 ctx.fillStyle = '#ffb74d'; ctx.fillText(`MA5: ${hData.ma5 ? hData.ma5.toFixed(2) : '--'}`, startX + 310, 20);
                 ctx.fillStyle = '#ba68c8'; ctx.fillText(`MA20: ${hData.ma20 ? hData.ma20.toFixed(2) : '--'}`, startX + 400, 20);
                 ctx.fillStyle = '#4fc3f7'; ctx.fillText(`MA60: ${hData.ma60 ? hData.ma60.toFixed(2) : '--'}`, startX + 495, 20);
 
-                // 成交量副圖標題換算
-                ctx.fillStyle = '#a1a4b0';
-                ctx.fillText(`成交量: ${formatVolumeUnit(hData.volume, isTWStock)}`, 10, volTop - 6);
-
-                ctx.fillStyle = '#ffeb3b'; ctx.fillText(`DIF(快): ${hData.macd_dif ? hData.macd_dif.toFixed(3) : '--'}`, 10, macdTop - 6);
-                ctx.fillStyle = '#00e5ff'; ctx.fillText(`DEA(慢): ${hData.macd_dem ? hData.macd_dem.toFixed(3) : '--'}`, 130, macdTop - 6);
-                
+                ctx.fillStyle = '#a1a4b0'; ctx.fillText(`成交量: ${formatVolumeUnit(hData.volume, isTWStock)}`, 10, volTop - 6);
+                ctx.fillStyle = '#ffeb3b'; ctx.fillText(`DIF: ${hData.macd_dif ? hData.macd_dif.toFixed(3) : '--'}`, 10, macdTop - 6);
+                ctx.fillStyle = '#00e5ff'; ctx.fillText(`DEA: ${hData.macd_dem ? hData.macd_dem.toFixed(3) : '--'}`, 130, macdTop - 6);
                 let oscColor = hData.macd_osc >= 0 ? '#ff4a4a' : '#26a69a';
-                ctx.fillStyle = '#e1e2e6'; ctx.fillText(`OSC(柱): `, 250, macdTop - 6);
-                ctx.fillStyle = oscColor; ctx.fillText(`${hData.macd_osc ? hData.macd_osc.toFixed(3) : '--'}`, 300, macdTop - 6);
+                ctx.fillStyle = '#e1e2e6'; ctx.fillText(`OSC: `, 250, macdTop - 6);
+                ctx.fillStyle = oscColor; ctx.fillText(`${hData.macd_osc ? hData.macd_osc.toFixed(3) : '--'}`, 290, macdTop - 6);
             }
         }
 
@@ -638,27 +833,24 @@
         }
 
         document.getElementById('symbol').addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                updateChart(true);
-            }
+            if (event.key === 'Enter') { event.preventDefault(); updateChart(true); }
         });
 
         const canvas = document.getElementById('stockCanvas');
         canvas.addEventListener('mousemove', (event) => {
             const rect = canvas.getBoundingClientRect();
-            mouseX = event.clientX - rect.left;
-            mouseY = event.clientY - rect.top; 
-            drawCanvasChart();
-            updateTopInfoPanel(); // 十字線滑動時，同步更新上方 info panel 的日期
+            mouseX = event.clientX - rect.left; mouseY = event.getClientRects; 
+            mouseX = event.clientX - rect.left; mouseY = event.clientY - rect.top; 
+            drawCanvasChart(); updateTopInfoPanel();
         });
         canvas.addEventListener('mouseleave', () => {
             mouseX = -1; mouseY = -1; 
-            currentHoveredCandle = rawData[rawData.length - 1]; 
-            drawCanvasChart();
-            updateTopInfoPanel();
+            if(rawData.length > 0) currentHoveredCandle = rawData[rawData.length - 1]; 
+            if(intradayData.points && intradayData.points.length > 0) currentHoveredPoint = intradayData.points[intradayData.points.length - 1];
+            drawCanvasChart(); updateTopInfoPanel();
         });
         canvas.addEventListener('wheel', (event) => {
+            if (viewMode !== 'kline') return; 
             event.preventDefault();
             if (event.deltaY > 0) { displayCount = Math.min(displayCount + 5, 300); } 
             else { displayCount = Math.max(displayCount - 5, 15); }
