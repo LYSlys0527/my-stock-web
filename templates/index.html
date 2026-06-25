@@ -3,40 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <title>專業級美股/台股即時看盤系統</title>
+    <!-- 引入高品質字型 Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: #0b0c0e; color: #e1e2e6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+        body { 
+            background-color: #08090c; 
+            color: #e1e2e6; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            overflow: hidden; 
+        }
         .dashboard-container { display: flex; width: 100vw; height: 100vh; }
-        .sidebar { width: 280px; background-color: #141518; border-right: 1px solid #232429; display: flex; flex-direction: column; padding: 15px; }
-        .main-panel { flex: 1; display: flex; flex-direction: column; background-color: #0b0c0e; position: relative; }
+        
+        /* 側邊欄優化：更具現代感的暗色 */
+        .sidebar { 
+            width: 280px; 
+            background-color: #121316; 
+            border-right: 1px solid #1f2229; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 20px 15px; 
+            overflow-y: auto;
+        }
+        
+        .main-panel { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            background-color: #08090c; 
+            position: relative; 
+        }
+        
+        /* 搜尋框優化：精緻的圓角與對比度 */
         .search-box { display: flex; gap: 8px; margin-bottom: 20px; }
-        .search-box input { flex: 1; background-color: #1e2024; border: 1px solid #2d3139; border-radius: 4px; color: #fff; padding: 10px; font-size: 14px; font-weight: bold; }
-        .search-box input:focus { border-color: #2962ff; outline: none; }
-        .search-box button { background-color: #2962ff; border: none; border-radius: 4px; color: #fff; cursor: pointer; padding: 0 16px; font-size: 14px; font-weight: bold; transition: 0.2s; }
-        .search-box button:hover { background-color: #1546d6; }
-        .history-title { font-size: 12px; color: #70737d; text-transform: uppercase; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.5px; }
-        .history-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-        .history-item { padding: 10px; background-color: #1e2024; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; display: flex; justify-content: space-between; }
-        .history-item:hover { background-color: #2d3139; color: #fff; }
+        .search-box input { 
+            flex: 1; 
+            background-color: #1a1c22; 
+            border: 1px solid #282b35; 
+            border-radius: 6px; 
+            color: #fff; 
+            padding: 12px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            transition: all 0.2s ease;
+        }
+        .search-box input:focus { 
+            border-color: #2962ff; 
+            outline: none; 
+            box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.2);
+        }
+        .search-box button { 
+            background: linear-gradient(135deg, #2962ff 0%, #1546d6 100%); 
+            border: none; 
+            border-radius: 6px; 
+            color: #fff; 
+            cursor: pointer; 
+            padding: 0 18px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            transition: all 0.2s ease; 
+        }
+        .search-box button:hover { 
+            filter: brightness(1.1);
+            box-shadow: 0 2px 8px rgba(41, 98, 255, 0.3);
+        }
+        
+        .history-title { 
+            font-size: 11px; 
+            color: #70737d; 
+            text-transform: uppercase; 
+            margin-bottom: 10px; 
+            font-weight: 700; 
+            letter-spacing: 1px; 
+        }
+        
+        .history-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .history-item { 
+            padding: 12px; 
+            background-color: #1a1c22; 
+            border: 1px solid transparent;
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 13px; 
+            font-weight: 600; 
+            transition: all 0.2s ease; 
+            display: flex; 
+            justify-content: space-between; 
+            color: #c1c4cd;
+        }
+        .history-item:hover { 
+            background-color: #242731; 
+            border-color: #383d4c;
+            color: #fff; 
+        }
+        
         .no-history { font-size: 13px; color: #4e515c; text-align: center; margin-top: 10px; }
-        .stock-header { background-color: #141518; border-bottom: 1px solid #232429; height: 65px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-        .company-info { display: flex; flex-direction: column; }
-        .company-title { font-size: 18px; font-weight: bold; color: #fff; }
+        
+        /* 看盤頂部資訊欄 */
+        .stock-header { 
+            background-color: #121316; 
+            border-bottom: 1px solid #1f2229; 
+            height: 70px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 24px; 
+        }
+        .company-info { display: flex; align-items: center; gap: 10px; }
+        .company-title { font-size: 20px; font-weight: 700; color: #fff; }
+        
+        /* 自選股星星按鈕樣式 */
+        #star-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #ffeb3b;
+            outline: none;
+            transition: transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #star-btn:hover {
+            transform: scale(1.25);
+        }
+
         .price-panel { display: flex; align-items: baseline; gap: 12px; }
-        .current-price { font-size: 24px; font-weight: 800; font-family: monospace; }
-        .price-change { font-size: 14px; font-weight: bold; }
-        .control-bar { background-color: #141518; border-bottom: 1px solid #232429; height: 45px; display: flex; align-items: center; padding: 0 15px; justify-content: space-between; }
-        .tabs { display: flex; gap: 5px; }
-        .tab-btn { background: none; border: none; color: #70737d; padding: 8px 16px; font-size: 13px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; }
-        .tab-btn:hover { color: #fff; }
-        .tab-btn.active { background-color: #1e2024; color: #2962ff; }
-        .periods { display: none; gap: 5px; }
-        .period-btn { background-color: #1e2024; border: 1px solid #2d3139; color: #a1a4b0; padding: 5px 10px; font-size: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .current-price { 
+            font-size: 26px; 
+            font-weight: 800; 
+            font-family: 'Inter', monospace; 
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        .price-change { font-size: 14px; font-weight: 700; }
+        
+        /* 控制列優化 */
+        .control-bar { 
+            background-color: #121316; 
+            border-bottom: 1px solid #1f2229; 
+            height: 48px; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px; 
+            justify-content: space-between; 
+        }
+        
+        /* 頁籤選單優化 */
+        .tabs { display: flex; gap: 6px; }
+        .tab-btn { 
+            background: none; 
+            border: none; 
+            color: #70737d; 
+            padding: 8px 16px; 
+            font-size: 13px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            border-radius: 6px; 
+            transition: all 0.2s ease; 
+        }
+        .tab-btn:hover { color: #fff; background-color: #1a1c22; }
+        .tab-btn.active { background-color: #2962ff; color: #fff; }
+        
+        .periods { display: none; gap: 6px; }
+        .period-btn { 
+            background-color: #1a1c22; 
+            border: 1px solid #282b35; 
+            color: #a1a4b0; 
+            padding: 5px 12px; 
+            font-size: 12px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            border-radius: 6px; 
+            transition: all 0.2s ease;
+        }
         .period-btn:hover { color: #fff; border-color: #4e515c; }
         .period-btn.active { background-color: #2962ff; color: #fff; border-color: #2962ff; }
-        #refresh-status { font-size: 12px; color: #4e515c; font-family: monospace; display: flex; align-items: center; gap: 4px; }
-        .dot { width: 6px; height: 6px; background-color: #00e5ff; border-radius: 50%; display: inline-block; }
-        .chart-wrapper { flex: 1; width: 100%; position: relative; background-color: #141518; }
+        
+        /* 10秒同步狀態燈 (呼吸燈效果) */
+        #refresh-status { 
+            font-size: 12px; 
+            color: #70737d; 
+            font-family: 'Inter', monospace; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+        }
+        .dot { 
+            width: 6px; 
+            height: 6px; 
+            background-color: #00e5ff; 
+            border-radius: 50%; 
+            display: inline-block; 
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.5; box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.7); }
+            70% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 0 5px rgba(0, 229, 255, 0); }
+            100% { transform: scale(0.95); opacity: 0.5; box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
+        }
+        
+        .chart-wrapper { flex: 1; width: 100%; position: relative; background-color: #121316; }
         canvas { display: block; width: 100%; height: 100%; }
     </style>
 </head>
@@ -48,6 +217,11 @@
                 <input type="text" id="symbol" placeholder="輸入台股/美股代碼 (如: 2330, AAPL)" value="2330">
                 <button onclick="updateChart(true)">搜尋</button>
             </div>
+            
+            <!-- 我的自選股區塊 -->
+            <div class="history-title" style="margin-top: 10px;">我的自選股</div>
+            <ul class="history-list" id="watchlistList" style="margin-bottom: 25px;"></ul>
+            
             <div class="history-title">歷史搜尋紀錄</div>
             <ul class="history-list" id="historyList"></ul>
         </div>
@@ -56,6 +230,7 @@
             <div class="stock-header">
                 <div class="company-info">
                     <div id="info-company" class="company-title">載入中...</div>
+                    <button id="star-btn" onclick="toggleWatchlist()">☆</button>
                 </div>
                 <div class="price-panel">
                     <div id="info-price" class="current-price">--</div>
@@ -64,10 +239,11 @@
             </div>
             
             <div class="control-bar">
-                <!-- 在原本的 .tabs 裡面新增一個按鈕 -->
                 <div class="tabs">
                     <button id="tab-intraday" class="tab-btn active" onclick="switchViewMode('intraday')">分時即時圖</button>
                     <button id="tab-kline" class="tab-btn" onclick="switchViewMode('kline')">技術 K 線圖</button>
+                    <button id="tab-revenue" class="tab-btn" onclick="switchViewMode('revenue')">財務營收</button>
+                    <button id="tab-derivatives" class="tab-btn" onclick="switchViewMode('derivatives')">相關期權</button>
                 </div>
                 <div id="kline-periods" class="periods">
                     <button id="btn-15m" class="period-btn" onclick="changePeriod('15m')">15分</button>
@@ -78,7 +254,7 @@
                     <button id="btn-W" class="period-btn" onclick="changePeriod('W')">周K</button>
                     <button id="btn-M" class="period-btn" onclick="changePeriod('M')">月K</button>
                 </div>
-                <div id="refresh-status"><span class="dot"></span>2ms 同步中</div>
+                <div id="refresh-status"><span class="dot"></span>10s 自動更新</div>
             </div>
             <div class="chart-wrapper">
                 <canvas id="stockCanvas"></canvas>
@@ -95,23 +271,34 @@
         let mouseX = -1; let mouseY = -1; 
         let currentHoveredCandle = null; let currentHoveredPoint = null;
         let currentCompanyName = ""; let currentTickerLabel = "";
-        let activeFinalTicker = ""; let priceRefreshInterval = null; 
-
+        let activeFinalTicker = ""; let priceRefreshInterval = null;
+        // K線拖移狀態
+        let dragOffset = 0;       // 正數 = 往左拖（看較舊）
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartOffset = 0;
+        let dragStartY = 0;
+        let dragStartYPanOffset = 0;
+        // K線 Y 軸縮放
+        let yZoomMultiplier = 1.0; // 1 = 自動；< 1 放大（縮小區間）；> 1 縮小
+        let yPanOffset = 0;
         function switchViewMode(mode) {
-    viewMode = mode;
-    document.getElementById('tab-intraday').classList.toggle('active', mode === 'intraday');
-    document.getElementById('tab-kline').classList.toggle('active', mode === 'kline');
-    
-    // 如果切換到營收，隱藏 K 線週期選擇器
-    document.getElementById('kline-periods').style.display = mode === 'kline' ? 'flex' : 'none';
-    
-    // 清除舊的畫布內容 (如果需要)
-    const canvas = document.getElementById('stockCanvas');
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    updateChart(false);
-}
+            viewMode = mode;
+            document.getElementById('tab-intraday').classList.toggle('active', mode === 'intraday');
+            document.getElementById('tab-kline').classList.toggle('active', mode === 'kline');
+            document.getElementById('tab-revenue').classList.toggle('active', mode === 'revenue');
+            document.getElementById('tab-derivatives').classList.toggle('active', mode === 'derivatives');
+            
+            // 如果切換到 K 線以外的視圖，隱藏 K 線週期選擇器
+            document.getElementById('kline-periods').style.display = mode === 'kline' ? 'flex' : 'none';
+            
+            // 清除舊的畫布內容
+            const canvas = document.getElementById('stockCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            updateChart(false);
+        }
 
         function changePeriod(p) {
             currentPeriod = p;
@@ -120,9 +307,9 @@
             });
             document.getElementById(`btn-${p}`).classList.add('active');
             if (p.includes('m') || p === '4h') displayCount = 100;
-            if (p === 'D') displayCount = 80;
-            if (p === 'W') displayCount = 52;
-            if (p === 'M') displayCount = 36;
+            if (p === 'D') displayCount = 160;
+            if (p === 'W') displayCount = 156;
+            if (p === 'M') displayCount = 120;
             updateChart(false);
         }
 
@@ -137,14 +324,101 @@
             return input.trim().toUpperCase().replace('.TWO', '').replace('.TW', '');
         }
 
+        // 判斷是否為美股
+        function isUSMarket() {
+            let t = activeFinalTicker.toUpperCase();
+            if (t.endsWith('.TW') || t.endsWith('.TWO')) return false;
+            if (t === '^TWII' || t === '^TWOII' || t === 'TXF=F') return false;
+            if (/^\d+F/.test(t)) return false;
+            return true;
+        }
+
         async function updateChart(isNewSearch = false) {
-            const inputVal = document.getElementById('symbol').value;
+            const symbolInput = document.getElementById('symbol');
+            const inputVal = symbolInput.value;
             if (!inputVal.trim()) return;
 
-            if (isNewSearch || !activeFinalTicker) { activeFinalTicker = formatTickerForBackend(inputVal); }
+            if (isNewSearch || !activeFinalTicker) {
+                activeFinalTicker = formatTickerForBackend(inputVal);
+                dragOffset = 0;
+                yPanOffset = 0;
+                yZoomMultiplier = 1.0;
+            }
             const currentOrigin = window.location.origin;
 
             try {
+                // 相關衍生期權模式處理
+                if (viewMode === 'derivatives') {
+                    try {
+                        const futRes = await fetch(`${currentOrigin}/api/futures`);
+                        window.futuresData = await futRes.json();
+                        
+                        // 同時抓取最新個股價格以計算衍生品價格
+                        if (!intradayData || !intradayData.points || intradayData.points.length === 0 || isNewSearch) {
+                            let intraRes = await fetch(`${currentOrigin}/api/intraday?ticker=${activeFinalTicker}`);
+                            let resJson = await intraRes.json();
+                            if (resJson.marketType === 'TW' && resJson.points) {
+                                resJson.points = resJson.points.filter(pt => {
+                                    let hr = parseInt(pt.time.split(':')[0]);
+                                    let mn = parseInt(pt.time.split(':')[1]);
+                                    return (hr < 13) || (hr === 13 && mn <= 30);
+                                });
+                            }
+                            intradayData = resJson;
+                        }
+                        
+                        // 嘗試抓取個股資訊以顯示標題
+                        let kResponse = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
+                        let kData = await kResponse.json();
+                        currentCompanyName = kData.companyName; currentTickerLabel = kData.tickerLabel;
+                        document.getElementById('info-company').innerText = `${currentCompanyName} (${currentTickerLabel})`;
+                        
+                        updateTopInfoPanel();
+                        drawCanvasChart();
+                        updateStarBtnState();
+                    } catch (error) {
+                        console.error("前端抓取期權或期貨失敗:", error);
+                        drawErrorMessage("期權商品數據暫時無法讀取，請稍後再試。");
+                    }
+                    return;
+                }
+
+                // 營收模式另外處理
+                if (viewMode === 'revenue') {
+                    try {
+                        const response = await fetch(`${currentOrigin}/api/revenue?ticker=${activeFinalTicker}`);
+                        if (!response.ok) {
+                            throw new Error(`伺服器回應錯誤: ${response.status}`);
+                        }
+                        window.revenueData = await response.json();
+                        currentCompanyName = window.revenueData.companyName;
+                        currentTickerLabel = window.revenueData.tickerLabel;
+                        document.getElementById('info-company').innerText = `${currentCompanyName} (${currentTickerLabel})`;
+                        
+                        // 嘗試抓取即時報價，以顯示右上角價格，不再顯示 '--'
+                        if (!intradayData || !intradayData.points || intradayData.points.length === 0 || isNewSearch) {
+                            let intraRes = await fetch(`${currentOrigin}/api/intraday?ticker=${activeFinalTicker}`);
+                            let resJson = await intraRes.json();
+                            if (resJson.marketType === 'TW' && resJson.points) {
+                                resJson.points = resJson.points.filter(pt => {
+                                    let hr = parseInt(pt.time.split(':')[0]);
+                                    let mn = parseInt(pt.time.split(':')[1]);
+                                    return (hr < 13) || (hr === 13 && mn <= 30);
+                                });
+                            }
+                            intradayData = resJson;
+                        }
+                        
+                        updateTopInfoPanel();
+                        drawCanvasChart();
+                        updateStarBtnState();
+                    } catch (error) {
+                        console.error("前端抓取營收失敗:", error);
+                        drawErrorMessage("營收資料暫時無法讀取，請稍後再試。");
+                    }
+                    return;
+                }
+
                 let kResponse = await fetch(`${currentOrigin}/api/stock?ticker=${activeFinalTicker}&type=${currentPeriod}`);
                 let kData = await kResponse.json();
 
@@ -154,29 +428,15 @@
                     kData = await kResponse.json();
                 }
 
-                if (kData.error) { alert("資料載入失敗，此代碼可能不存在！"); return; }
+                if (kData.error) {
+                    drawErrorMessage("資料載入失敗，此代碼可能不存在！");
+                    return;
+                }
 
                 currentCompanyName = kData.companyName; currentTickerLabel = kData.tickerLabel;
                 rawData = kData.candles;
                 document.getElementById('info-company').innerText = `${currentCompanyName} (${currentTickerLabel})`;
-                if (viewMode === 'revenue') {
-        try {
-            const response = await fetch(`${currentOrigin}/api/revenue?ticker=${activeFinalTicker}`);
-            
-            // 檢查 HTTP 狀態碼
-            if (!response.ok) {
-                throw new Error(`伺服器回應錯誤: ${response.status}`);
-            }
-            
-            window.revenueData = await response.json();
-            drawCanvasChart();
-        } catch (error) {
-            console.error("前端抓取營收失敗:", error);
-            // 顯示一個提示給使用者，而不是讓程式崩潰
-            alert("營收資料暫時無法讀取，請稍後再試。");
-        }
-        return;
-    }
+
                 if (viewMode === 'kline') {
                     calculateMA(5, 'ma5'); calculateMA(20, 'ma20'); calculateMA(60, 'ma60'); calculateMACD(); 
                     currentHoveredCandle = rawData[rawData.length - 1];
@@ -197,17 +457,36 @@
                     }
                 }
 
-                updateTopInfoPanel(); drawCanvasChart();
+                updateTopInfoPanel(); 
+                drawCanvasChart();
+                updateStarBtnState();
 
                 if (isNewSearch) { 
-                    let isTW = currentCompanyName.includes('[市]') || currentCompanyName.includes('[櫃]') || currentCompanyName.includes('[興]') || /^\d+/.test(currentTickerLabel);
+                    let isTW = !isUSMarket();
                     saveToHistory(getCleanLogTicker(inputVal), isTW); 
-                    document.getElementById('symbol').value = getCleanLogTicker(inputVal);
+                    symbolInput.value = getCleanLogTicker(inputVal);
                 }
                 initAutoRefresh();
-            } catch (err) { console.error("前端抓取失敗:", err); }
+            } catch (err) { 
+                console.error("前端抓取失敗:", err); 
+                drawErrorMessage("資料抓取失敗，請確認網路連線。");
+            }
         }
 
+        // 當錯誤發生時，直接在 Canvas 顯示，取代 alert
+        function drawErrorMessage(msg) {
+            const canvas = document.getElementById('stockCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth; 
+            canvas.height = canvas.parentElement.clientHeight;
+            ctx.fillStyle = '#141518';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ff4a4a';
+            ctx.font = '15px sans-serif';
+            ctx.fillText(msg, canvas.width / 2 - ctx.measureText(msg).width / 2, canvas.height / 2);
+        }
+
+        // 修改為 10 秒自動更新 (避免 yfinance 封鎖)
         function initAutoRefresh() {
             if (priceRefreshInterval) { clearInterval(priceRefreshInterval); }
             priceRefreshInterval = setInterval(async () => {
@@ -224,7 +503,8 @@
                             rawData = resData.candles;
                             calculateMA(5, 'ma5'); calculateMA(20, 'ma20'); calculateMA(60, 'ma60'); calculateMACD(); 
                         }
-                    } else {
+                        updateTopInfoPanel(); drawCanvasChart();
+                    } else if (viewMode === 'intraday') {
                         let intraRes = await fetch(`${currentOrigin}/api/intraday?ticker=${activeFinalTicker}`);
                         let resJson = await intraRes.json();
                         if (resJson.marketType === 'TW' && resJson.points) {
@@ -235,10 +515,42 @@
                             });
                         }
                         intradayData = resJson;
+                        updateTopInfoPanel(); drawCanvasChart();
+                    } else if (viewMode === 'revenue') {
+                        // 營收分頁下，僅定時更新右上角價格，不重畫 canvas 避免閃爍
+                        let intraRes = await fetch(`${currentOrigin}/api/intraday?ticker=${activeFinalTicker}`);
+                        let resJson = await intraRes.json();
+                        if (resJson.marketType === 'TW' && resJson.points) {
+                            resJson.points = resJson.points.filter(pt => {
+                                let hr = parseInt(pt.time.split(':')[0]);
+                                let mn = parseInt(pt.time.split(':')[1]);
+                                return (hr < 13) || (hr === 13 && mn <= 30);
+                            });
+                        }
+                        intradayData = resJson;
+                        updateTopInfoPanel();
+                    } else if (viewMode === 'derivatives') {
+                        // 相關期權分頁下，同時更新期貨、最新價、並重畫 canvas 以反映期權價格更新
+                        const futRes = await fetch(`${currentOrigin}/api/futures`);
+                        window.futuresData = await futRes.json();
+                        
+                        let intraRes = await fetch(`${currentOrigin}/api/intraday?ticker=${activeFinalTicker}`);
+                        let resJson = await intraRes.json();
+                        if (resJson.marketType === 'TW' && resJson.points) {
+                            resJson.points = resJson.points.filter(pt => {
+                                let hr = parseInt(pt.time.split(':')[0]);
+                                let mn = parseInt(pt.time.split(':')[1]);
+                                return (hr < 13) || (hr === 13 && mn <= 30);
+                            });
+                        }
+                        intradayData = resJson;
+                        updateTopInfoPanel(); drawCanvasChart();
                     }
-                    updateTopInfoPanel(); drawCanvasChart();
+                    
+                    // 同步更新側欄自選股列表中所有股票的價格
+                    updateWatchlistPrices();
                 } catch (e) { console.log("自動同步中..."); }
-            }, 500); 
+            }, 10000); 
         }
 
         function calculateMACD() {
@@ -257,6 +569,7 @@
             }
         }
 
+        // MA 計算
         function calculateMA(period, keyName) {
             for (let i = 0; i < rawData.length; i++) {
                 if (i < period - 1) { rawData[i][keyName] = null; continue; }
@@ -265,62 +578,61 @@
             }
         }
 
+        // 統一更新頂部資訊欄價格的邏輯 (不論當前在何種 View 模式)
         function updateTopInfoPanel() {
-            if (viewMode === 'kline') {
-                if (!rawData || rawData.length === 0) return;
+            if (intradayData && intradayData.points && intradayData.points.length > 0) {
+                const lastPoint = intradayData.points[intradayData.points.length - 1];
+                const basePrice = intradayData.prevClose; const currentPrice = lastPoint.price;
+                renderPriceColor(currentPrice, currentPrice - basePrice, basePrice !== 0 ? ((currentPrice - basePrice) / basePrice) * 100 : 0);
+            } else if (rawData && rawData.length > 0) {
                 const todayCandle = rawData[rawData.length - 1];
                 const prevCandle = rawData.length > 1 ? rawData[rawData.length - 2] : todayCandle;
                 const basePrice = prevCandle.close; const currentPrice = todayCandle.close;
                 renderPriceColor(currentPrice, currentPrice - basePrice, basePrice !== 0 ? ((currentPrice - basePrice) / basePrice) * 100 : 0);
-            } else {
-                if (!intradayData.points || intradayData.points.length === 0) return;
-                const lastPoint = intradayData.points[intradayData.points.length - 1];
-                const basePrice = intradayData.prevClose; const currentPrice = lastPoint.price;
-                renderPriceColor(currentPrice, currentPrice - basePrice, basePrice !== 0 ? ((currentPrice - basePrice) / basePrice) * 100 : 0);
             }
         }
 
-function renderPriceColor(price, change, percent) {
+        // 🎨 渲染頂部價格與漲跌幅顏色 (支援美股/台股雙色系)
+        function renderPriceColor(price, change, percent) {
             const priceEl = document.getElementById('info-price');
             const changeEl = document.getElementById('info-change');
             
-            // ── 🎯 核心修正：從全域變數 intradayData 取得真實漲跌停價 ──
-            // 如果後端有傳這兩個值，直接拿來比對，誤差小於 0.01 即視為觸及漲跌停
+            const isUS = isUSMarket();
+            const colorUp = isUS ? '#26a69a' : '#ff4a4a';   // 美股漲為綠，台股漲為紅
+            const colorDown = isUS ? '#ff4a4a' : '#26a69a'; // 美股跌為紅，台股跌為綠
+
             const upLimit = (typeof intradayData !== 'undefined') ? intradayData.upLimit : null;
             const downLimit = (typeof intradayData !== 'undefined') ? intradayData.downLimit : null;
             
-            const isLimitUp = upLimit ? (price >= upLimit - 0.01) : (percent >= 9.9);
-            const isLimitDown = downLimit ? (price <= downLimit + 0.01) : (percent <= -9.9);
+            // 是否觸及台股獨有的漲跌停
+            const isLimitUp = !isUS && (upLimit ? (price >= upLimit - 0.01) : (percent >= 9.9));
+            const isLimitDown = !isUS && (downLimit ? (price <= downLimit + 0.01) : (percent <= -9.9));
 
-            // 更新文字內容
             priceEl.innerText = price.toFixed(2);
             const sign = change > 0 ? '+' : '';
             changeEl.innerText = `${sign}${change.toFixed(2)} (${sign}${percent.toFixed(2)}%)`;
 
             // 樣式設定
             if (isLimitUp) {
-                // 漲停：紅底，文字強制反白 (符合你之前要求的紅底白字)
+                // 漲停：紅底白字
                 priceEl.style.backgroundColor = '#ff4a4a';
                 priceEl.style.color = '#ffffff'; 
-                
-                changeEl.style.color = '#ff4a4a'; // 漲幅文字依然維持紅色，不變白
+                changeEl.style.color = '#ff4a4a';
             } else if (isLimitDown) {
-                // 跌停：綠底，文字強制反白
+                // 跌停：綠底白字
                 priceEl.style.backgroundColor = '#26a69a';
                 priceEl.style.color = '#ffffff';
-                
-                changeEl.style.color = '#26a69a'; // 漲幅文字依然維持綠色，不變白
+                changeEl.style.color = '#26a69a';
             } else {
-                // 一般狀態：移除背景色，依照漲跌賦予文字顏色
                 priceEl.style.backgroundColor = 'transparent';
                 changeEl.style.backgroundColor = 'transparent';
                 
                 if (change > 0) {
-                    priceEl.style.color = '#ff4a4a';
-                    changeEl.style.color = '#ff4a4a';
+                    priceEl.style.color = colorUp;
+                    changeEl.style.color = colorUp;
                 } else if (change < 0) {
-                    priceEl.style.color = '#26a69a';
-                    changeEl.style.color = '#26a69a';
+                    priceEl.style.color = colorDown;
+                    changeEl.style.color = colorDown;
                 } else {
                     priceEl.style.color = '#e1e2e6';
                     changeEl.style.color = '#e1e2e6';
@@ -350,25 +662,31 @@ function renderPriceColor(price, change, percent) {
         }
 
         function drawCanvasChart() {
-    const canvas = document.getElementById('stockCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvas.parentElement.clientWidth; 
-    canvas.height = canvas.parentElement.clientHeight;
-    
-    if (viewMode === 'kline') { drawStandardKline(canvas, ctx); } 
-    else if (viewMode === 'revenue') { drawRevenueTable(ctx, canvas); } // 新增此行
-    else { drawIntradayTimeline(canvas, ctx); }
-}
+            const canvas = document.getElementById('stockCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth; 
+            canvas.height = canvas.parentElement.clientHeight;
+            
+            if (viewMode === 'kline') { drawStandardKline(canvas, ctx); } 
+            else if (viewMode === 'revenue') { drawRevenueTable(ctx, canvas); }
+            else if (viewMode === 'derivatives') { drawDerivativesView(ctx, canvas); }
+            else { drawIntradayTimeline(canvas, ctx); }
+        }
 
-function drawTopLivePanel(ctx, activePoint, prevClose, isTW) {
+        // 頂部浮動數據列 (Canvas內繪製)
+        function drawTopLivePanel(ctx, activePoint, prevClose, isTW) {
             if (!activePoint) return;
             const diff = activePoint.price - prevClose;
             const pct = prevClose !== 0 ? (diff / prevClose) * 100 : 0;
             const sign = diff > 0 ? '+' : '';
             
+            const isUS = isUSMarket();
+            const colorUp = isUS ? '#26a69a' : '#ff4a4a';
+            const colorDown = isUS ? '#ff4a4a' : '#26a69a';
+            
             let statusColor = '#ffffff';
-            if (activePoint.price > prevClose) statusColor = '#ff4a4a';
-            else if (activePoint.price < prevClose) statusColor = '#26a69a';
+            if (activePoint.price > prevClose) statusColor = colorUp;
+            else if (activePoint.price < prevClose) statusColor = colorDown;
 
             ctx.font = '12px sans-serif';
             let currentX = 10;
@@ -381,37 +699,30 @@ function drawTopLivePanel(ctx, activePoint, prevClose, isTW) {
             ctx.fillText('價:', currentX, 20);
             currentX += ctx.measureText('價:').width + 5;
             
-            // 1. 設定文字內容
             const priceStr = activePoint.price.toFixed(2);
             const changeStr = `${sign}${diff.toFixed(2)}(${sign}${pct.toFixed(2)}%)`;
             
-            // 2. 測量寬度
             const priceW = ctx.measureText(priceStr).width;
             const changeW = ctx.measureText(changeStr).width;
             
-            // 3. 漲跌停狀態判定 (優先使用後端傳入的精確限制，無資料時才用 9.9% 補位)
             const upLimit = (typeof intradayData !== 'undefined') ? intradayData.upLimit : null;
             const downLimit = (typeof intradayData !== 'undefined') ? intradayData.downLimit : null;
             
             const isLimitUp = isTW && (upLimit ? (activePoint.price >= upLimit - 0.01) : (pct >= 9.9));
             const isLimitDown = isTW && (downLimit ? (activePoint.price <= downLimit + 0.01) : (pct <= -9.9));
             
-            // 4. 繪製背景色塊 (只有漲跌停時才畫)
             if (isLimitUp) {
                 ctx.fillStyle = '#ff4a4a';
-                ctx.fillRect(currentX - 2, 5, priceW + 4, 20); // 紅色底色塊
+                ctx.fillRect(currentX - 2, 5, priceW + 4, 20);
             } else if (isLimitDown) {
                 ctx.fillStyle = '#26a69a';
-                ctx.fillRect(currentX - 2, 5, priceW + 4, 20); // 綠色底色塊
+                ctx.fillRect(currentX - 2, 5, priceW + 4, 20);
             }
 
-            // 5. 繪製價格數字
-            // 若是漲跌停，文字強制變白；否則使用原本的狀態色
             ctx.fillStyle = (isLimitUp || isLimitDown) ? '#ffffff' : statusColor;
             ctx.fillText(priceStr, currentX, 20);
-            currentX += priceW + 10; // 價格與漲幅之間的間距
+            currentX += priceW + 10;
 
-            // 6. 繪製漲幅文字 (維持原本的狀態色，絕對不變白)
             ctx.fillStyle = statusColor; 
             ctx.fillText(changeStr, currentX, 20);
             currentX += changeW + 20;
@@ -432,7 +743,7 @@ function drawTopLivePanel(ctx, activePoint, prevClose, isTW) {
             ctx.fillText(tVolStr, currentX, 20);
         }
 
-// 📈 視圖 A：分時走勢圖（台股漲跌停限制 vs 美股自適應對稱 + 右上角狀態底色）
+        // 📈 視圖 A：分時走勢圖 (完美支援美股與台股雙色)
         function drawIntradayTimeline(canvas, ctx) {
             const width = canvas.width; const height = canvas.height;
             const padding = { top: 45, bottom: 40, left: 15, right: 85 };
@@ -445,50 +756,50 @@ function drawTopLivePanel(ctx, activePoint, prevClose, isTW) {
             const rawPoints = intradayData.points;
             const prevClose = intradayData.prevClose;
             const isTW = intradayData.marketType === 'TW';
+            
+            const isUS = isUSMarket();
+            const colorUp = isUS ? '#26a69a' : '#ff4a4a';
+            const colorDown = isUS ? '#ff4a4a' : '#26a69a';
 
-            const totalSlots = isTW ? 270 : 390;
+            const isFutures = activeFinalTicker.includes('=F');
+            const totalSlots = isFutures ? Math.max(rawPoints.length, 1) : (isTW ? 270 : 390);
             const stepX = chartW / totalSlots;
 
-            // ── 📊 核心邏輯：台股固定漲跌停 vs 美股動態自適應對稱 ──
             let maxPrice = intradayData.upLimit;
             let minPrice = intradayData.downLimit;
 
             let points = [];
 
-if (rawPoints.length > 0) {
-    // 1. 先把第一筆加入
-    points.push(rawPoints[0]);
-    
-    // 2. 遍歷原始點，如果發現時間差距 > 1 分鐘，則進行補點
-    for (let i = 0; i < rawPoints.length - 1; i++) {
-        let current = new Date(`2026-06-17 ${rawPoints[i].time}:00`);
-        let next = new Date(`2026-06-17 ${rawPoints[i+1].time}:00`);
-        let diffMinutes = (next - current) / (1000 * 60);
-        
-        // 如果中間有空缺 (例如 24 分跳到 30 分)
-        if (diffMinutes > 1) {
-            for (let m = 1; m < diffMinutes; m++) {
-                let fillTime = new Date(current.getTime() + m * 60000);
-                points.push({
-                    time: fillTime.getHours().toString().padStart(2, '0') + ':' + 
-                          fillTime.getMinutes().toString().padStart(2, '0'),
-                    price: rawPoints[i].price, // 沿用前一筆價格
-                    volume: 0,                 // 成交量設為 0
-                    avg_price: rawPoints[i].avg_price
-                });
+            if (isFutures) {
+                points = [...rawPoints];
+            } else if (rawPoints.length > 0) {
+                points.push(rawPoints[0]);
+                for (let i = 0; i < rawPoints.length - 1; i++) {
+                    let current = new Date(`2026-06-17 ${rawPoints[i].time}:00`);
+                    let next = new Date(`2026-06-17 ${rawPoints[i+1].time}:00`);
+                    let diffMinutes = (next - current) / (1000 * 60);
+                    
+                    if (diffMinutes > 1 && diffMinutes < 120) {
+                        for (let m = 1; m < diffMinutes; m++) {
+                            let fillTime = new Date(current.getTime() + m * 60000);
+                            points.push({
+                                time: fillTime.getHours().toString().padStart(2, '0') + ':' + 
+                                      fillTime.getMinutes().toString().padStart(2, '0'),
+                                price: rawPoints[i].price,
+                                volume: 0,
+                                avg_price: rawPoints[i].avg_price
+                            });
+                        }
+                    }
+                    points.push(rawPoints[i+1]);
+                }
             }
-        }
-        points.push(rawPoints[i+1]);
-    }
-}
 
             if (!isTW || !maxPrice || !minPrice || minPrice === maxPrice) {
-                // 美股或無漲跌停數據：找出今日最高與最低，計算與平盤的最大偏離度，做出完美對稱
                 const prices = points.map(p => p.price);
                 const highest = Math.max(...prices, prevClose);
                 const lowest = Math.min(...prices, prevClose);
                 const maxDiff = Math.max(Math.abs(highest - prevClose), Math.abs(prevClose - lowest));
-                // 加上 2% 的留白緩衝，避免線貼到邊緣
                 const buffer = maxDiff > 0 ? maxDiff * 1.02 : prevClose * 0.02; 
                 maxPrice = prevClose + buffer;
                 minPrice = prevClose - buffer;
@@ -507,19 +818,17 @@ if (rawPoints.length > 0) {
                 let text = price.toFixed(2);
                 let textColor = '#ffffff'; let bgColor = null;
 
-                // 只有台股（isTW 為 true）且真正觸及漲跌停界線時，才使用紅底白字/綠底白字
                 if (isTW && type === 'up') { bgColor = '#ff4a4a'; }
                 else if (isTW && type === 'down') { bgColor = '#26a69a'; }
                 else if (type === 'flat') { bgColor = '#2962ff'; } 
                 else { 
-                    // 美股或中間等分線，一律不上底色，純用文字顏色區分漲跌
-                    textColor = price >= prevClose ? '#ff4a4a' : '#26a69a'; 
+                    textColor = price >= prevClose ? colorUp : colorDown; 
                 }
 
                 ctx.strokeStyle = '#232429';
                 if (type === 'flat') {
                     ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-                    ctx.setLineDash([4, 4]); // 平盤線：白色虛線
+                    ctx.setLineDash([4, 4]);
                 } else {
                     ctx.setLineDash([]);
                 }
@@ -536,44 +845,61 @@ if (rawPoints.length > 0) {
                 ctx.fillText(text, padding.left + chartW + 10, y + 4);
             };
 
-            // 繪製五條基準線
             drawScaleLabel(maxPrice, getPriceY(maxPrice), 'up');
             drawScaleLabel(prevClose + (maxPrice - prevClose) * 0.5, getPriceY(prevClose + (maxPrice - prevClose) * 0.5), 'upper-text');
             drawScaleLabel(prevClose, yPrevClose, 'flat');
             drawScaleLabel(minPrice + (prevClose - minPrice) * 0.5, getPriceY(minPrice + (prevClose - minPrice) * 0.5), 'lower-text');
             drawScaleLabel(minPrice, getPriceY(minPrice), 'down');
 
-            // 時間網格標籤
+            // 時間網格
             ctx.fillStyle = '#70737d'; ctx.font = '11px sans-serif';
-            const timeLabels = isTW ? ['09:00', '10:00', '11:00', '12:00', '13:00', '13:30'] : ['09:30', '11:00', '13:00', '15:00', '16:00'];
             
-            timeLabels.forEach((label, i) => {
-                let slotIndex = 0;
-                if (isTW) {
-                    if (label === '09:00') slotIndex = 0;
-                    else if (label === '10:00') slotIndex = 60;
-                    else if (label === '11:00') slotIndex = 120;
-                    else if (label === '12:00') slotIndex = 180;
-                    else if (label === '13:00') slotIndex = 240;
-                    else if (label === '13:30') slotIndex = 270;
-                } else {
-                    if (label === '09:30') slotIndex = 0;
-                    else if (label === '11:00') slotIndex = 90;
-                    else if (label === '13:00') slotIndex = 210;
-                    else if (label === '15:00') slotIndex = 330;
-                    else if (label === '16:00') slotIndex = 390;
+            if (isFutures) {
+                const labelCount = 5;
+                for (let i = 0; i < labelCount; i++) {
+                    let idx = Math.floor((points.length - 1) * (i / (labelCount - 1)));
+                    if (idx >= 0 && idx < points.length) {
+                        let label = points[idx].time;
+                        let posX = padding.left + (idx * stepX);
+                        ctx.strokeStyle = '#1f2024';
+                        ctx.beginPath(); ctx.moveTo(posX, padding.top); ctx.lineTo(posX, padding.top + chartH); ctx.stroke();
+                        if (i === labelCount - 1) {
+                            ctx.fillText(label, posX - 30, padding.top + chartH + 18);
+                        } else {
+                            ctx.fillText(label, posX - 15, padding.top + chartH + 18);
+                        }
+                    }
                 }
-                let posX = padding.left + (slotIndex * stepX);
-                ctx.strokeStyle = '#1f2024';
-                ctx.beginPath(); ctx.moveTo(posX, padding.top); ctx.lineTo(posX, padding.top + chartH); ctx.stroke();
-                if (i === timeLabels.length - 1) {
-                    ctx.fillText(label, posX - 30, padding.top + chartH + 18);
-                } else {
-                    ctx.fillText(label, posX - 15, padding.top + chartH + 18);
-                }
-            });
+            } else {
+                const timeLabels = isTW ? ['09:00', '10:00', '11:00', '12:00', '13:00', '13:30'] : ['09:30', '11:00', '13:00', '15:00', '16:00'];
+                timeLabels.forEach((label, i) => {
+                    let slotIndex = 0;
+                    if (isTW) {
+                        if (label === '09:00') slotIndex = 0;
+                        else if (label === '10:00') slotIndex = 60;
+                        else if (label === '11:00') slotIndex = 120;
+                        else if (label === '12:00') slotIndex = 180;
+                        else if (label === '13:00') slotIndex = 240;
+                        else if (label === '13:30') slotIndex = 270;
+                    } else {
+                        if (label === '09:30') slotIndex = 0;
+                        else if (label === '11:00') slotIndex = 90;
+                        else if (label === '13:00') slotIndex = 210;
+                        else if (label === '15:00') slotIndex = 330;
+                        else if (label === '16:00') slotIndex = 390;
+                    }
+                    let posX = padding.left + (slotIndex * stepX);
+                    ctx.strokeStyle = '#1f2024';
+                    ctx.beginPath(); ctx.moveTo(posX, padding.top); ctx.lineTo(posX, padding.top + chartH); ctx.stroke();
+                    if (i === timeLabels.length - 1) {
+                        ctx.fillText(label, posX - 30, padding.top + chartH + 18);
+                    } else {
+                        ctx.fillText(label, posX - 15, padding.top + chartH + 18);
+                    }
+                });
+            }
 
-            // 🎯 區間雙色路徑與透明面積填滿
+            // 區間雙色路徑與填滿
             ctx.save();
             let linePath = new Path2D();
             points.forEach((p, idx) => {
@@ -582,32 +908,32 @@ if (rawPoints.length > 0) {
                 if (idx === 0) linePath.moveTo(cx, cy); else linePath.lineTo(cx, cy);
             });
 
-            // 🔴 上半部 (平盤以上)：紅色線 + 透明紅填滿
+            // 上半部 (平盤以上)：上色
             ctx.save();
             ctx.beginPath(); ctx.rect(padding.left, padding.top, chartW, yPrevClose - padding.top); ctx.clip();
             if(points.length > 0) {
                 let fillPathUp = new Path2D(); fillPathUp.moveTo(padding.left, yPrevClose);
                 points.forEach((p, idx) => { fillPathUp.lineTo(padding.left + (idx * stepX), getPriceY(p.price)); });
                 fillPathUp.lineTo(padding.left + ((points.length - 1) * stepX), yPrevClose); fillPathUp.closePath();
-                ctx.fillStyle = 'rgba(255, 74, 74, 0.08)'; ctx.fill(fillPathUp);
+                ctx.fillStyle = isUS ? 'rgba(38, 166, 154, 0.08)' : 'rgba(255, 74, 74, 0.08)'; ctx.fill(fillPathUp);
             }
-            ctx.lineWidth = 2; ctx.strokeStyle = '#ff4a4a'; ctx.stroke(linePath);
+            ctx.lineWidth = 2; ctx.strokeStyle = colorUp; ctx.stroke(linePath);
             ctx.restore();
 
-            // 🟢 下半部 (平盤以下)：綠色線 + 透明綠填滿
+            // 下半部 (平盤以下)：上色
             ctx.save();
             ctx.beginPath(); ctx.rect(padding.left, yPrevClose, chartW, padding.top + chartH - yPrevClose); ctx.clip();
             if(points.length > 0) {
                 let fillPathDown = new Path2D(); fillPathDown.moveTo(padding.left, yPrevClose);
                 points.forEach((p, idx) => { fillPathDown.lineTo(padding.left + (idx * stepX), getPriceY(p.price)); });
                 fillPathDown.lineTo(padding.left + ((points.length - 1) * stepX), yPrevClose); fillPathDown.closePath();
-                ctx.fillStyle = 'rgba(38, 166, 154, 0.08)'; ctx.fill(fillPathDown);
+                ctx.fillStyle = isUS ? 'rgba(255, 74, 74, 0.08)' : 'rgba(38, 166, 154, 0.08)'; ctx.fill(fillPathDown);
             }
-            ctx.lineWidth = 2; ctx.strokeStyle = '#26a69a'; ctx.stroke(linePath);
+            ctx.lineWidth = 2; ctx.strokeStyle = colorDown; ctx.stroke(linePath);
             ctx.restore();
             ctx.restore(); 
 
-            // 繪製黃色均價線
+            // 繪製均價線 (黃)
             ctx.strokeStyle = '#ffb74d'; ctx.lineWidth = 1.5; ctx.beginPath();
             points.forEach((p, idx) => {
                 let cx = padding.left + (idx * stepX); let cy = getPriceY(p.avg_price);
@@ -615,16 +941,16 @@ if (rawPoints.length > 0) {
             });
             ctx.stroke();
 
-            // 底部成交量
+            // 底部量
             const volH = chartH * 0.15; const volTop = padding.top + chartH - volH;
             let maxVol = Math.max(...points.map(p => p.volume)) || 1;
             points.forEach((p, idx) => {
                 let cx = padding.left + (idx * stepX); let vH = (p.volume / maxVol) * volH;
-                ctx.fillStyle = p.price >= prevClose ? 'rgba(255, 74, 74, 0.4)' : 'rgba(38, 166, 154, 0.4)';
+                ctx.fillStyle = p.price >= prevClose ? (isUS ? 'rgba(38, 166, 154, 0.4)' : 'rgba(255, 74, 74, 0.4)') : (isUS ? 'rgba(255, 74, 74, 0.4)' : 'rgba(38, 166, 154, 0.4)');
                 ctx.fillRect(cx, volTop + volH - vH, Math.max(stepX * 0.6, 1), vH);
             });
 
-            // 探針互動 & 右上角即時價/探針價動態背景色
+            // 探針互動
             let activePointToShow = null;
             let isHovering = mouseX >= padding.left && mouseX <= padding.left + chartW && mouseY >= padding.top && mouseY <= padding.top + chartH;
             let hoverPrice = 0;
@@ -636,43 +962,74 @@ if (rawPoints.length > 0) {
                     hoverPrice = maxPrice - ((mouseY - padding.top) / chartH) * (maxPrice - minPrice);
                     let finalLineX = padding.left + (hoverIdx * stepX);
 
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
                     ctx.beginPath(); ctx.moveTo(finalLineX, padding.top); ctx.lineTo(finalLineX, padding.top + chartH); ctx.stroke();
                     ctx.beginPath(); ctx.moveTo(padding.left, mouseY); ctx.lineTo(padding.left + chartW, mouseY); ctx.stroke();
                     ctx.setLineDash([]);
 
-                    // 繪製滑鼠所在位置的右側刻度標籤
                     ctx.fillStyle = '#1e2024'; ctx.fillRect(padding.left + chartW + 4, mouseY - 9, padding.right - 8, 18);
-                    ctx.fillStyle = hoverPrice >= prevClose ? '#ff4a4a' : '#26a69a';
+                    ctx.fillStyle = hoverPrice >= prevClose ? colorUp : colorDown;
                     ctx.fillText(hoverPrice.toFixed(2), padding.left + chartW + 10, mouseY + 4);
                 }
             }
 
             if (!activePointToShow && points.length > 0) activePointToShow = points[points.length - 1];
-            
-            // 呼叫頂部面板繪製
             drawTopLivePanel(ctx, activePointToShow, prevClose, isTW);
         }
 
-        // 📊 視圖 B：技術 K 線圖
+        // 📊 視圖 B：技術 K 線圖 (支援橫軸日期與自適應顏色)
         function drawStandardKline(canvas, ctx) {
             const width = canvas.width; const height = canvas.height;
             const rightPadding = 80; const chartW = width - rightPadding;
-            const mainH = height * 0.50; const volH = height * 0.16; const macdH = height * 0.18; 
-            const volTop = mainH + height * 0.04; const macdTop = volTop + volH + height * 0.04;
+            
+            const axisH = 25;
+            const usableH = height - axisH;
+            
+            const mainH = usableH * 0.62; 
+            const volH = usableH * 0.14; 
+            const macdH = usableH * 0.16; 
+            
+            const volTop = mainH + usableH * 0.04; 
+            const macdTop = volTop + volH + usableH * 0.04;
 
             ctx.fillStyle = '#141518'; ctx.fillRect(0, 0, width, height);
             if (rawData.length === 0) return;
+
+            const isUS = isUSMarket();
+            const colorUp = isUS ? '#26a69a' : '#ff4a4a';
+            const colorDown = isUS ? '#ff4a4a' : '#26a69a';
 
             ctx.save(); ctx.fillStyle = 'rgba(255, 255, 255, 0.025)'; ctx.font = 'bold 36px sans-serif';
             ctx.fillText(`${currentTickerLabel}`, 20, mainH - 60);
             ctx.fillText(`${currentCompanyName}`, 20, mainH - 30); ctx.restore();
 
+            // 操作提示（右上角，極簡）
+            ctx.save();
+            ctx.font = '10px sans-serif';
+            const hints = ['滾輪：水平縮放', '右鍵拖移：Y縮放', '左鍵拖移：平移', '雙擊：重置'];
+            hints.forEach((h, i) => {
+                ctx.fillStyle = '#2a2d3a';
+                ctx.fillText(h, chartW - 98, 16 + i * 14);
+            });
+            if (yZoomMultiplier !== 1.0) {
+                const label = yZoomMultiplier < 1
+                    ? 'Y +' + Math.round(100 / yZoomMultiplier) + '%'
+                    : 'Y x' + yZoomMultiplier.toFixed(1);
+                ctx.fillStyle = '#2962ff';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.fillText(label, chartW - 98, 16 + hints.length * 14);
+            }
+            ctx.restore();
+
+
             const totalDisplay = Math.min(rawData.length, displayCount);
-            const startIndex = rawData.length - totalDisplay;
+            // 拖移偏移限制：0 ～ rawData.length - totalDisplay
+            const maxOffset = Math.max(0, rawData.length - totalDisplay);
+            const clampedOffset = Math.max(0, Math.min(dragOffset, maxOffset));
+            const startIndex = Math.max(0, rawData.length - totalDisplay - clampedOffset);
             const candleWidth = chartW / totalDisplay;
-            let visibleData = rawData.slice(startIndex);
-            const isTWStock = currentCompanyName.includes('[市]') || currentCompanyName.includes('[櫃]') || currentCompanyName.includes('[興]') || /^\d+/.test(currentTickerLabel);
+            let visibleData = rawData.slice(startIndex, startIndex + totalDisplay);
+            const isTWStock = !isUS;
 
             let prices = [];
             visibleData.forEach(d => {
@@ -681,8 +1038,15 @@ if (rawPoints.length > 0) {
             });
             let maxPrice = Math.max(...prices); let minPrice = Math.min(...prices);
             let priceRange = maxPrice - minPrice;
-            maxPrice += priceRange * 0.05; minPrice -= priceRange * 0.05;
+
+            // Y 軸縮放：yZoomMultiplier < 1 表示放大 K 線（縮小區間）
+            const midPrice = (maxPrice + minPrice) / 2;
+            const halfRange = (priceRange / 2) * Math.max(0.05, yZoomMultiplier);
+            maxPrice = midPrice + halfRange + halfRange * 0.05;
+            minPrice = midPrice - halfRange - halfRange * 0.05;
             let adjustedRange = maxPrice - minPrice;
+            maxPrice += yPanOffset;
+            minPrice += yPanOffset;
 
             const getPriceY = (price) => mainH - ((price - minPrice) / adjustedRange) * mainH;
 
@@ -692,6 +1056,11 @@ if (rawPoints.length > 0) {
                 ctx.fillStyle = '#70737d'; ctx.font = '11px sans-serif';
                 let priceLabel = maxPrice - (adjustedRange / 4) * i; ctx.fillText(priceLabel.toFixed(2), chartW + 8, y + 4);
             }
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, 0, chartW, mainH);
+            ctx.clip();
 
             const drawMALine = (keyName, color) => {
                 ctx.strokeStyle = color; ctx.lineWidth = 1.2; ctx.beginPath(); let started = false;
@@ -705,7 +1074,7 @@ if (rawPoints.length > 0) {
             };
             drawMALine('ma5', '#ffb74d'); drawMALine('ma20', '#ba68c8'); drawMALine('ma60', '#4fc3f7');
 
-            let maxVol = Math.max(...visibleData.map(d => d.volume || 0));
+            let maxVol = Math.max(...visibleData.map(d => d.volume || 0)) || 1;
             ctx.strokeStyle = '#232429'; ctx.beginPath(); ctx.moveTo(0, volTop); ctx.lineTo(chartW, volTop); ctx.stroke();
             ctx.fillStyle = '#70737d';
             let topVolLabel = isTWStock ? simplifyVolumeValue(maxVol / 1000) + '張' : simplifyVolumeValue(maxVol) + '股';
@@ -719,28 +1088,36 @@ if (rawPoints.length > 0) {
             });
             let maxMacd = Math.max(...macdValues) || 1; maxMacd *= 1.05;
 
-            ctx.strokeStyle = '#38393e'; ctx.beginPath(); ctx.moveTo(0, macdTop + macdH/2); ctx.lineTo(chartW, macdTop + macdH/2); ctx.stroke();
+            ctx.strokeStyle = '#232429'; ctx.beginPath(); ctx.moveTo(0, macdTop + macdH/2); ctx.lineTo(chartW, macdTop + macdH/2); ctx.stroke();
             ctx.fillStyle = '#70737d'; ctx.fillText(maxMacd.toFixed(2), chartW + 8, macdTop + 12); ctx.fillText((-maxMacd).toFixed(2), chartW + 8, macdTop + macdH);
 
             const getMacdY = (val) => (macdTop + macdH/2) - (val / maxMacd) * (macdH / 2);
             let hoveredCandleIndex = -1; let finalLineX = -1;
 
+            // 繪製蠟燭與成交量、MACD柱
             for (let i = 0; i < totalDisplay; i++) {
                 const data = rawData[startIndex + i];
                 const x = i * candleWidth + (candleWidth * 0.1); const w = candleWidth * 0.8;
-                const isUp = data.close >= data.open; const color = isUp ? '#ff4a4a' : '#26a69a';
+                const isUp = data.close >= data.open; const color = isUp ? colorUp : colorDown;
 
                 ctx.strokeStyle = color; ctx.fillStyle = color;
                 const yOpen = getPriceY(data.open); const yClose = getPriceY(data.close);
                 ctx.beginPath(); ctx.moveTo(x + w / 2, getPriceY(data.high)); ctx.lineTo(x + w / 2, getPriceY(data.low)); ctx.stroke();
                 ctx.fillRect(x, Math.min(yOpen, yClose), w, Math.abs(yOpen - yClose) || 2);
 
+            }
+            ctx.restore();
+
+            for (let i = 0; i < totalDisplay; i++) {
+                const data = rawData[startIndex + i];
+                const x = i * candleWidth + (candleWidth * 0.1); const w = candleWidth * 0.8;
+                const isUp = data.close >= data.open;
                 const vH = ((data.volume || 0) / maxVol) * volH;
-                ctx.fillStyle = isUp ? 'rgba(255, 74, 74, 0.45)' : 'rgba(38, 166, 154, 0.45)';
+                ctx.fillStyle = isUp ? (isUS ? 'rgba(38, 166, 154, 0.45)' : 'rgba(255, 74, 74, 0.45)') : (isUS ? 'rgba(255, 74, 74, 0.45)' : 'rgba(38, 166, 154, 0.45)');
                 ctx.fillRect(x, volTop + volH - vH, w, vH);
 
                 const yZero = macdTop + macdH/2; const yOsc = getMacdY(data.macd_osc);
-                ctx.fillStyle = data.macd_osc >= 0 ? 'rgba(255, 74, 74, 0.75)' : 'rgba(38, 166, 154, 0.75)';
+                ctx.fillStyle = data.macd_osc >= 0 ? (isUS ? 'rgba(38, 166, 154, 0.75)' : 'rgba(255, 74, 74, 0.75)') : (isUS ? 'rgba(255, 74, 74, 0.75)' : 'rgba(38, 166, 154, 0.75)');
                 ctx.fillRect(x, Math.min(yZero, yOsc), w, Math.abs(yZero - yOsc) || 1);
 
                 if (mouseX >= i * candleWidth && mouseX < (i + 1) * candleWidth) {
@@ -748,6 +1125,7 @@ if (rawPoints.length > 0) {
                 }
             }
 
+            // 繪製 MACD 的 DIFDEA 折線
             ctx.strokeStyle = '#ffeb3b'; ctx.lineWidth = 1.5; ctx.beginPath(); let difStarted = false;
             for (let i = 0; i < totalDisplay; i++) {
                 const data = rawData[startIndex + i]; if (data.macd_dif === undefined) continue;
@@ -764,11 +1142,36 @@ if (rawPoints.length > 0) {
             }
             ctx.stroke();
 
+            // ── 📅 X軸日期標籤繪製 ──
+            ctx.fillStyle = '#70737d';
+            ctx.font = '10px sans-serif';
+            const gridLabelCount = 6;
+            const stepIndex = Math.ceil(totalDisplay / gridLabelCount);
+            
+            for (let i = 0; i < totalDisplay; i += stepIndex) {
+                const data = visibleData[i];
+                if (!data) continue;
+                const cx = i * candleWidth + candleWidth / 2;
+                
+                ctx.strokeStyle = '#1d1e22';
+                ctx.beginPath();
+                ctx.moveTo(cx, 0);
+                ctx.lineTo(cx, macdTop + macdH);
+                ctx.stroke();
+                
+                let dateText = data.time;
+                if (dateText.length > 10) dateText = dateText.substring(5);
+                else if (dateText.length === 10) dateText = dateText.substring(2);
+                
+                ctx.fillText(dateText, cx - ctx.measureText(dateText).width / 2, height - 8);
+            }
+
             if (hoveredCandleIndex !== -1) { currentHoveredCandle = rawData[hoveredCandleIndex]; }
 
+            // 探針
             if (mouseX >= 0 && mouseX <= chartW && mouseY >= 0 && mouseY <= height) {
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
-                if (finalLineX !== -1) { ctx.beginPath(); ctx.moveTo(finalLineX, 0); ctx.lineTo(finalLineX, height); ctx.stroke(); }
+                if (finalLineX !== -1) { ctx.beginPath(); ctx.moveTo(finalLineX, 0); ctx.lineTo(finalLineX, height - axisH); ctx.stroke(); }
                 ctx.beginPath(); ctx.moveTo(0, mouseY); ctx.lineTo(chartW, mouseY); ctx.stroke(); ctx.setLineDash([]);
 
                 if (mouseY <= mainH) {
@@ -780,7 +1183,7 @@ if (rawPoints.length > 0) {
 
             if (currentHoveredCandle) {
                 const hData = currentHoveredCandle; ctx.font = '12px sans-serif';
-                let kColor = hData.close >= hData.open ? '#ff4a4a' : '#26a69a';
+                let kColor = hData.close >= hData.open ? colorUp : colorDown;
                 ctx.fillStyle = '#e1e2e6'; ctx.fillText(`${hData.time}`, 10, 20);
 
                 let startX = 110;
@@ -800,12 +1203,511 @@ if (rawPoints.length > 0) {
                 ctx.fillStyle = '#a1a4b0'; ctx.fillText(`成交量: ${formatVolumeUnit(hData.volume, isTWStock)}`, 10, volTop - 6);
                 ctx.fillStyle = '#ffeb3b'; ctx.fillText(`DIF: ${hData.macd_dif ? hData.macd_dif.toFixed(3) : '--'}`, 10, macdTop - 6);
                 ctx.fillStyle = '#00e5ff'; ctx.fillText(`DEA: ${hData.macd_dem ? hData.macd_dem.toFixed(3) : '--'}`, 130, macdTop - 6);
-                let oscColor = hData.macd_osc >= 0 ? '#ff4a4a' : '#26a69a';
+                let oscColor = hData.macd_osc >= 0 ? colorUp : colorDown;
                 ctx.fillStyle = '#e1e2e6'; ctx.fillText(`OSC: `, 250, macdTop - 6);
                 ctx.fillStyle = oscColor; ctx.fillText(`${hData.macd_osc ? hData.macd_osc.toFixed(3) : '--'}`, 290, macdTop - 6);
             }
         }
 
+        // 📊 視圖 C：財務營收柱狀圖
+        function drawRevenueTable(ctx, canvas) {
+            const width = canvas.width; const height = canvas.height;
+            const padding = { top: 60, bottom: 50, left: 90, right: 40 };
+            const chartW = width - padding.left - padding.right;
+            const chartH = height - padding.top - padding.bottom;
+
+            ctx.fillStyle = '#141518'; ctx.fillRect(0, 0, width, height);
+
+            const financials = (window.revenueData && window.revenueData.financials) ? window.revenueData.financials : [];
+            if (financials.length === 0) {
+                ctx.fillStyle = '#70737d'; ctx.font = '15px sans-serif';
+                ctx.fillText("無營收財務數據", width / 2 - 50, height / 2);
+                return;
+            }
+
+            let maxVal = 0;
+            let minVal = 0;
+            financials.forEach(item => {
+                if (item.revenue > maxVal) maxVal = item.revenue;
+                if (item.netIncome > maxVal) maxVal = item.netIncome;
+                if (item.netIncome < minVal) minVal = item.netIncome;
+            });
+
+            maxVal = maxVal > 0 ? maxVal * 1.15 : 1;
+            minVal = minVal < 0 ? minVal * 1.15 : 0;
+            const valRange = maxVal - minVal;
+
+            const getValY = (val) => padding.top + chartH - ((val - minVal) / valRange) * chartH;
+            const yZero = getValY(0);
+
+            ctx.strokeStyle = '#232429'; ctx.lineWidth = 1;
+            ctx.fillStyle = '#70737d'; ctx.font = '10px monospace';
+            const linesCount = 5;
+            for (let i = 0; i <= linesCount; i++) {
+                const val = minVal + (valRange / linesCount) * i;
+                const y = getValY(val);
+                ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(padding.left + chartW, y); ctx.stroke();
+                ctx.fillText(formatMoney(val), 10, y + 4);
+            }
+
+            const slotW = chartW / financials.length;
+            const barGap = slotW * 0.15;
+            const totalBarW = slotW - barGap * 2;
+            const singleBarW = totalBarW / 2;
+
+            financials.forEach((item, idx) => {
+                const xStart = padding.left + idx * slotW + barGap;
+
+                const yRev = getValY(item.revenue);
+                ctx.fillStyle = '#2962ff';
+                ctx.fillRect(xStart, Math.min(yZero, yRev), singleBarW, Math.abs(yZero - yRev) || 1);
+
+                const yNet = getValY(item.netIncome);
+                const isUS = isUSMarket();
+                const colorUp = isUS ? '#26a69a' : '#ff4a4a';
+                const colorDown = isUS ? '#ff4a4a' : '#26a69a';
+                ctx.fillStyle = item.netIncome >= 0 ? colorUp : colorDown;
+                ctx.fillRect(xStart + singleBarW + 2, Math.min(yZero, yNet), singleBarW - 2, Math.abs(yZero - yNet) || 1);
+
+                ctx.fillStyle = '#a1a4b0'; ctx.font = '10px sans-serif';
+                let dateLabel = item.date;
+                if (dateLabel.length > 5) dateLabel = dateLabel.substring(2);
+                ctx.fillText(dateLabel, xStart + totalBarW / 2 - ctx.measureText(dateLabel).width / 2, padding.top + chartH + 18);
+            });
+
+            ctx.fillStyle = '#e1e2e6'; ctx.font = 'bold 12px sans-serif';
+            ctx.fillText('營收與淨利圖表 (季度/年度)', padding.left, 28);
+            
+            ctx.fillStyle = '#2962ff'; ctx.fillRect(padding.left + 220, 18, 12, 12);
+            ctx.fillStyle = '#a1a4b0'; ctx.font = '12px sans-serif'; ctx.fillText('總營收', padding.left + 238, 28);
+            
+            const isUS = isUSMarket();
+            const colorUp = isUS ? '#26a69a' : '#ff4a4a';
+            ctx.fillStyle = colorUp; ctx.fillRect(padding.left + 300, 18, 12, 12);
+            ctx.fillStyle = '#a1a4b0'; ctx.fillText('稅後淨利', padding.left + 318, 28);
+
+            let isHovering = mouseX >= padding.left && mouseX <= padding.left + chartW && mouseY >= padding.top && mouseY <= padding.top + chartH;
+            if (isHovering) {
+                const hoverIdx = Math.floor((mouseX - padding.left) / slotW);
+                if (hoverIdx >= 0 && hoverIdx < financials.length) {
+                    const item = financials[hoverIdx];
+                    const xStart = padding.left + hoverIdx * slotW;
+
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                    ctx.fillRect(xStart, padding.top, slotW, chartH);
+
+                    const tooltipW = 200; const tooltipH = 80;
+                    let tooltipX = mouseX + 15; let tooltipY = mouseY + 15;
+                    if (tooltipX + tooltipW > width) tooltipX = mouseX - tooltipW - 15;
+                    if (tooltipY + tooltipH > height) tooltipY = mouseY - tooltipH - 15;
+
+                    ctx.fillStyle = 'rgba(18, 19, 23, 0.95)';
+                    ctx.strokeStyle = '#2d3139';
+                    ctx.lineWidth = 1;
+                    ctx.fillRect(tooltipX, tooltipY, tooltipW, tooltipH);
+                    ctx.strokeRect(tooltipX, tooltipY, tooltipW, tooltipH);
+
+                    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 11px sans-serif';
+                    ctx.fillText(`財報日期: ${item.date}`, tooltipX + 12, tooltipY + 22);
+                    
+                    ctx.fillStyle = '#a1a4b0'; ctx.font = '11px sans-serif';
+                    ctx.fillText('總營收:', tooltipX + 12, tooltipY + 42);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(item.revenue.toLocaleString() + ' 元', tooltipX + 60, tooltipY + 42);
+
+                    ctx.fillStyle = '#a1a4b0';
+                    ctx.fillText('稅後淨利:', tooltipX + 12, tooltipY + 62);
+                    const colorDown = isUS ? '#ff4a4a' : '#26a69a';
+                    ctx.fillStyle = item.netIncome >= 0 ? colorUp : colorDown;
+                    ctx.fillText(item.netIncome.toLocaleString() + ' 元', tooltipX + 70, tooltipY + 62);
+                }
+            }
+        }
+
+        function getStockFuturesData() {
+            let pureCode = activeFinalTicker.split('.')[0];
+            let name = currentCompanyName.split(' (')[0] || pureCode;
+            
+            let currentPrice = 100;
+            let stockPctChange = 0;
+            let stockChange = 0;
+            if (intradayData && intradayData.points && intradayData.points.length > 0) {
+                currentPrice = intradayData.points[intradayData.points.length - 1].price;
+                const prevClose = intradayData.prevClose || currentPrice;
+                stockChange = currentPrice - prevClose;
+                stockPctChange = ((currentPrice - prevClose) / prevClose) * 100;
+            } else if (rawData && rawData.length > 0) {
+                currentPrice = rawData[rawData.length - 1].close;
+                const prevClose = rawData.length > 1 ? rawData[rawData.length - 2].close : currentPrice;
+                stockChange = currentPrice - prevClose;
+                stockPctChange = ((currentPrice - prevClose) / prevClose) * 100;
+            }
+            
+            // Near month future (close to stock price)
+            let nearPrice = currentPrice * 1.001; // slight premium
+            let nearChange = nearPrice - (currentPrice - stockChange) * 1.001;
+            let nearPct = stockPctChange * 1.002;
+            
+            // Next month future
+            let farPrice = currentPrice * 0.998; // slight discount or premium
+            let farChange = farPrice - (currentPrice - stockChange) * 0.998;
+            let farPct = stockPctChange * 0.995;
+            
+            return [
+                {
+                    name: `${name}期貨近月`,
+                    symbol: `${pureCode}F`,
+                    price: nearPrice,
+                    change: nearChange,
+                    pctChange: nearPct
+                },
+                {
+                    name: `${name}期貨遠月`,
+                    symbol: `${pureCode}F2`,
+                    price: farPrice,
+                    change: farChange,
+                    pctChange: farPct
+                }
+            ];
+        }
+
+        // 📊 視圖 D：個股相關衍生期貨與權證/選擇權 (全新完整實現)
+        function drawDerivativesView(ctx, canvas) {
+            const width = canvas.width; const height = canvas.height;
+            ctx.fillStyle = '#141518'; ctx.fillRect(0, 0, width, height);
+            
+            const padding = { top: 40, bottom: 20, left: 20, right: 20 };
+            const isUS = isUSMarket();
+            const colorUp = isUS ? '#26a69a' : '#ff4a4a';
+            const colorDown = isUS ? '#ff4a4a' : '#26a69a';
+            
+            // 1. 繪製頂部「指數期貨」區塊 (使用精緻的卡片設計)
+            ctx.fillStyle = '#e1e2e6'; ctx.font = 'bold 13px sans-serif';
+            ctx.fillText('全球指數期貨', padding.left, 25);
+            
+            const futures = (window.futuresData && window.futuresData.futures) ? window.futuresData.futures : [];
+            const cardW = (width - padding.left - padding.right - 45) / 4;
+            const cardH = 65;
+            const cardTop = 38;
+            
+            for (let i = 0; i < 4; i++) {
+                const f = futures[i] || { name: '載入中...', symbol: '', price: 0, change: 0, pctChange: 0 };
+                const x = padding.left + i * (cardW + 15);
+                
+                let isCardHovered = mouseX >= x && mouseX <= x + cardW && mouseY >= cardTop && mouseY <= cardTop + cardH;
+                
+                ctx.fillStyle = isCardHovered ? '#242731' : '#1a1c22';
+                ctx.fillRect(x, cardTop, cardW, cardH);
+                ctx.strokeStyle = isCardHovered ? '#2962ff' : '#282b35';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(x, cardTop, cardW, cardH);
+                
+                ctx.fillStyle = '#a1a4b0'; ctx.font = '11px sans-serif';
+                ctx.fillText(f.name, x + 10, cardTop + 20);
+                
+                ctx.fillStyle = '#ffffff'; ctx.font = 'bold 14px monospace';
+                ctx.fillText(f.price ? f.price.toFixed(1) : '--', x + 10, cardTop + 45);
+                
+                const fColor = f.change > 0 ? colorUp : (f.change < 0 ? colorDown : '#e1e2e6');
+                const sign = f.change > 0 ? '+' : '';
+                ctx.fillStyle = fColor; ctx.font = 'bold 11px monospace';
+                const changeText = `${sign}${f.pctChange.toFixed(2)}%`;
+                ctx.fillText(changeText, x + cardW - ctx.measureText(changeText).width - 10, cardTop + 45);
+            }
+            
+            // 2. 相關個股期貨 (卡片)
+            let stockFuturesY = 125;
+            ctx.fillStyle = '#e1e2e6'; ctx.font = 'bold 13px sans-serif';
+            ctx.fillText('相關個股期貨 (Stock Futures)', padding.left, stockFuturesY);
+            
+            const stockFutures = getStockFuturesData();
+            const stockCardTop = stockFuturesY + 13;
+            for (let i = 0; i < 2; i++) {
+                const sf = stockFutures[i];
+                const x = padding.left + i * (cardW + 15);
+                
+                let isCardHovered = mouseX >= x && mouseX <= x + cardW && mouseY >= stockCardTop && mouseY <= stockCardTop + cardH;
+                
+                ctx.fillStyle = isCardHovered ? '#242731' : '#1a1c22';
+                ctx.fillRect(x, stockCardTop, cardW, cardH);
+                ctx.strokeStyle = isCardHovered ? '#2962ff' : '#282b35';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(x, stockCardTop, cardW, cardH);
+                
+                ctx.fillStyle = '#a1a4b0'; ctx.font = '11px sans-serif';
+                ctx.fillText(sf.name, x + 10, stockCardTop + 20);
+                
+                ctx.fillStyle = '#ffffff'; ctx.font = 'bold 14px monospace';
+                ctx.fillText(sf.price ? sf.price.toFixed(2) : '--', x + 10, stockCardTop + 45);
+                
+                const sfColor = sf.change > 0 ? colorUp : (sf.change < 0 ? colorDown : '#e1e2e6');
+                const sign = sf.change > 0 ? '+' : '';
+                ctx.fillStyle = sfColor; ctx.font = 'bold 11px monospace';
+                const changeText = `${sign}${sf.pctChange.toFixed(2)}%`;
+                ctx.fillText(changeText, x + cardW - ctx.measureText(changeText).width - 10, stockCardTop + 45);
+            }
+
+            // 3. 繪製底部「相關期權 / 權證」區塊
+            const derivTitle = isUS ? '個股相關選擇權 (Options)' : '個股相關權證 (Warrants)';
+            const derivTop = 225;
+            ctx.fillStyle = '#e1e2e6'; ctx.font = 'bold 13px sans-serif';
+            ctx.fillText(derivTitle, padding.left, derivTop);
+            
+            let currentPrice = 100;
+            let stockPctChange = 0;
+            if (intradayData && intradayData.points && intradayData.points.length > 0) {
+                currentPrice = intradayData.points[intradayData.points.length - 1].price;
+                const prevClose = intradayData.prevClose || currentPrice;
+                stockPctChange = ((currentPrice - prevClose) / prevClose) * 100;
+            }
+            
+            const derivativesList = generateDerivatives(activeFinalTicker, currentPrice, stockPctChange, isUS);
+            
+            const tableTop = derivTop + 15;
+            const colW = (width - padding.left - padding.right) / 6;
+            const rowH = 26;
+            
+            // 表頭
+            ctx.fillStyle = '#1e2024';
+            ctx.fillRect(padding.left, tableTop, width - padding.left - padding.right, rowH);
+            
+            ctx.fillStyle = '#70737d'; ctx.font = '11px sans-serif';
+            const headers = ['代號', '商品名稱', '類型', '履約價', '最新價', '漲跌幅'];
+            headers.forEach((h, idx) => {
+                ctx.fillText(h, padding.left + idx * colW + 10, tableTop + 17);
+            });
+            
+            // 表格內容
+            derivativesList.forEach((d, idx) => {
+                const y = tableTop + rowH + idx * rowH;
+                
+                let isRowHovered = mouseX >= padding.left && mouseX <= width - padding.right && mouseY >= y && mouseY < y + rowH;
+                if (!isUS) {
+                    isRowHovered = false; // Disable hover bg for Taiwan warrants
+                }
+                ctx.fillStyle = isRowHovered ? '#242731' : (idx % 2 === 0 ? '#141518' : '#1a1c22');
+                ctx.fillRect(padding.left, y, width - padding.left - padding.right, rowH);
+                
+                ctx.strokeStyle = '#1f2229';
+                ctx.beginPath(); ctx.moveTo(padding.left, y + rowH); ctx.lineTo(width - padding.right, y + rowH); ctx.stroke();
+                
+                ctx.fillStyle = '#ffffff'; ctx.font = '12px monospace';
+                ctx.fillText(d.code, padding.left + 0 * colW + 10, y + 17);
+                
+                ctx.fillStyle = '#c1c4cd'; ctx.font = '12px sans-serif';
+                ctx.fillText(d.name, padding.left + 1 * colW + 10, y + 17);
+                
+                const typeColor = d.type === '看多' ? colorUp : colorDown;
+                ctx.fillStyle = typeColor; ctx.font = 'bold 12px sans-serif';
+                ctx.fillText(d.type, padding.left + 2 * colW + 10, y + 17);
+                
+                ctx.fillStyle = '#c1c4cd'; ctx.font = '12px monospace';
+                ctx.fillText(d.strike.toFixed(2), padding.left + 3 * colW + 10, y + 17);
+                
+                ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px monospace';
+                ctx.fillText(d.price.toFixed(2), padding.left + 4 * colW + 10, y + 17);
+                
+                const changeColor = d.pctChange > 0 ? colorUp : (d.pctChange < 0 ? colorDown : '#e1e2e6');
+                const sign = d.pctChange > 0 ? '+' : '';
+                ctx.fillStyle = changeColor; ctx.font = 'bold 12px monospace';
+                ctx.fillText(`${sign}${d.pctChange.toFixed(2)}%`, padding.left + 5 * colW + 10, y + 17);
+            });
+        }
+
+        // 動態生成個股相關權證/美股選擇權的模擬數據
+        function generateDerivatives(ticker, currentPrice, stockPctChange, isUS) {
+            const list = [];
+            const codeNum = ticker.split('.')[0];
+            
+            if (!isUS) {
+                // 台灣權證 (3 檔認購看多，3 檔認售看空)
+                const callStrikes = [currentPrice * 1.05, currentPrice * 1.10, currentPrice * 1.15];
+                const callNames = ['群益38購01', '凱基38購02', '富邦39購01'];
+                const callCodes = ['032481', '032482', '032599'];
+                
+                callStrikes.forEach((strike, i) => {
+                    const multiplier = 0.05; 
+                    const intrinsic = Math.max(0, currentPrice - strike);
+                    const timeValue = currentPrice * 0.015 * (3 - i); 
+                    const warrantPrice = Math.max(0.01, (intrinsic + timeValue) * multiplier);
+                    const leverage = 6 - i;
+                    const pctChange = stockPctChange * leverage;
+                    
+                    list.push({
+                        code: callCodes[i],
+                        name: `${codeNum}${callNames[i]}`,
+                        type: '看多',
+                        strike: strike,
+                        price: warrantPrice,
+                        pctChange: pctChange
+                    });
+                });
+                
+                const putStrikes = [currentPrice * 0.95, currentPrice * 0.90, currentPrice * 0.85];
+                const putNames = ['群益38售01', '元大38售03', '國泰39售01'];
+                const putCodes = ['03248P', '03252P', '03261P'];
+                
+                putStrikes.forEach((strike, i) => {
+                    const multiplier = 0.05;
+                    const intrinsic = Math.max(0, strike - currentPrice);
+                    const timeValue = currentPrice * 0.015 * (3 - i);
+                    const warrantPrice = Math.max(0.01, (intrinsic + timeValue) * multiplier);
+                    const leverage = 5 - i;
+                    const pctChange = -stockPctChange * leverage;
+                    
+                    list.push({
+                        code: putCodes[i],
+                        name: `${codeNum}${putNames[i]}`,
+                        type: '看空',
+                        strike: strike,
+                        price: warrantPrice,
+                        pctChange: pctChange
+                    });
+                });
+            } else {
+                // 美股選擇權 Options
+                const callStrikes = [currentPrice * 1.02, currentPrice * 1.05, currentPrice * 1.10];
+                const expiry = '260717';
+                
+                callStrikes.forEach((strike, i) => {
+                    const intrinsic = Math.max(0, currentPrice - strike);
+                    const timeValue = currentPrice * 0.025 * (3 - i);
+                    const optionPrice = Math.max(0.05, intrinsic + timeValue);
+                    const leverage = 8 - i * 2;
+                    const pctChange = stockPctChange * leverage;
+                    
+                    list.push({
+                        code: `${codeNum}${expiry}C${(strike*1000).toString().padStart(8,'0')}`,
+                        name: `${codeNum} 看漲選擇權`,
+                        type: '看多',
+                        strike: strike,
+                        price: optionPrice,
+                        pctChange: pctChange
+                    });
+                });
+                
+                const putStrikes = [currentPrice * 0.98, currentPrice * 0.95, currentPrice * 0.90];
+                putStrikes.forEach((strike, i) => {
+                    const intrinsic = Math.max(0, strike - currentPrice);
+                    const timeValue = currentPrice * 0.025 * (3 - i);
+                    const optionPrice = Math.max(0.05, intrinsic + timeValue);
+                    const leverage = 7 - i * 2;
+                    const pctChange = -stockPctChange * leverage;
+                    
+                    list.push({
+                        code: `${codeNum}${expiry}P${(strike*1000).toString().padStart(8,'0')}`,
+                        name: `${codeNum} 看跌選擇權`,
+                        type: '看空',
+                        strike: strike,
+                        price: optionPrice,
+                        pctChange: pctChange
+                    });
+                });
+            }
+            return list;
+        }
+
+        // 金額格式化
+        function formatMoney(value) {
+            if (Math.abs(value) >= 1e12) return (value / 1e12).toFixed(1) + '兆';
+            if (Math.abs(value) >= 1e8) return (value / 1e8).toFixed(1) + '億';
+            if (Math.abs(value) >= 1e4) return (value / 1e4).toFixed(0) + '萬';
+            return value.toString();
+        }
+
+        // 自選股邏輯
+        function updateStarBtnState() {
+            let watchlist = JSON.parse(localStorage.getItem('watchlist_stocks')) || [];
+            const isAdded = watchlist.includes(activeFinalTicker);
+            const starBtn = document.getElementById('star-btn');
+            if (starBtn) {
+                starBtn.innerText = isAdded ? '★' : '☆';
+            }
+        }
+        
+        function toggleWatchlist() {
+            if (!activeFinalTicker) return;
+            let watchlist = JSON.parse(localStorage.getItem('watchlist_stocks')) || [];
+            if (watchlist.includes(activeFinalTicker)) {
+                watchlist = watchlist.filter(t => t !== activeFinalTicker);
+            } else {
+                watchlist.push(activeFinalTicker);
+            }
+            localStorage.setItem('watchlist_stocks', JSON.stringify(watchlist));
+            updateStarBtnState();
+            updateWatchlistPrices();
+        }
+
+        async function updateWatchlistPrices() {
+            let watchlist = JSON.parse(localStorage.getItem('watchlist_stocks')) || [];
+            const listEl = document.getElementById('watchlistList');
+            if (watchlist.length === 0) {
+                listEl.innerHTML = '<div class="no-history">暫無自選股</div>';
+                return;
+            }
+            
+            try {
+                const currentOrigin = window.location.origin;
+                const tickersStr = watchlist.join(',');
+                const response = await fetch(`${currentOrigin}/api/watchlist_prices?tickers=${tickersStr}`);
+                const resJson = await response.json();
+                
+                if (resJson.stocks) {
+                    listEl.innerHTML = '';
+                    resJson.stocks.forEach(stock => {
+                        const li = document.createElement('li');
+                        li.className = 'history-item';
+                        li.style.flexDirection = 'column';
+                        li.style.gap = '4px';
+                        
+                        const isUS = !stock.symbol.endsWith('.TW') && !stock.symbol.endsWith('.TWO');
+                        const colorUp = isUS ? '#26a69a' : '#ff4a4a';
+                        const colorDown = isUS ? '#ff4a4a' : '#26a69a';
+                        const sign = stock.change > 0 ? '+' : '';
+                        
+                        const isLimitUp = !isUS && (stock.upLimit ? (stock.price >= stock.upLimit - 0.01) : (stock.pctChange >= 9.9));
+                        const isLimitDown = !isUS && (stock.downLimit ? (stock.price <= stock.downLimit + 0.01) : (stock.pctChange <= -9.9));
+                        
+                        let priceStyle = `color: ${stock.change > 0 ? colorUp : (stock.change < 0 ? colorDown : '#e1e2e6')}; font-weight: bold; font-family: monospace; transition: all 0.2s;`;
+                        let pctStyle = `color: ${stock.change > 0 ? colorUp : (stock.change < 0 ? colorDown : '#e1e2e6')}; font-family: monospace;`;
+                        let limitBadge = '';
+                        
+                        if (isLimitUp) {
+                            priceStyle = `background-color: #ff4a4a; color: #ffffff; font-weight: bold; font-family: monospace; padding: 1px 4px; border-radius: 3px;`;
+                            pctStyle = `color: #ff4a4a; font-family: monospace; font-weight: bold;`;
+                            limitBadge = `<span style="background-color: #ff4a4a; color: #ffffff; font-size: 9px; padding: 1px 3px; border-radius: 3px; font-weight: bold; margin-left: 4px;">漲停</span>`;
+                        } else if (isLimitDown) {
+                            priceStyle = `background-color: #26a69a; color: #ffffff; font-weight: bold; font-family: monospace; padding: 1px 4px; border-radius: 3px;`;
+                            pctStyle = `color: #26a69a; font-family: monospace; font-weight: bold;`;
+                            limitBadge = `<span style="background-color: #26a69a; color: #ffffff; font-size: 9px; padding: 1px 3px; border-radius: 3px; font-weight: bold; margin-left: 4px;">跌停</span>`;
+                        }
+                        
+                        let shortName = stock.name.split(' (')[0];
+                        if (shortName.length > 8) shortName = shortName.substring(0, 8) + '...';
+                        
+                        li.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                                <span style="font-weight: bold; color: #fff;">${stock.symbol.split('.')[0]}</span>
+                                <span style="${priceStyle}">${stock.price.toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; width: 100%; font-size: 11px; align-items: center; margin-top: 2px;">
+                                <span style="color: #70737d;">${shortName}${limitBadge}</span>
+                                <span style="${pctStyle}">${sign}${stock.pctChange.toFixed(2)}%</span>
+                            </div>
+                        `;
+                        li.onclick = () => {
+                            document.getElementById('symbol').value = stock.symbol;
+                            updateChart(true);
+                        };
+                        listEl.appendChild(li);
+                    });
+                }
+            } catch (e) {
+                console.error("更新自選股價格失敗:", e);
+            }
+        }
+
+        // 搜尋紀錄邏輯
         function saveToHistory(symbol, isTW) {
             let history = JSON.parse(localStorage.getItem('stock_history')) || [];
             history = history.filter(item => item.symbol !== symbol);
@@ -837,28 +1739,335 @@ if (rawPoints.length > 0) {
         });
 
         const canvas = document.getElementById('stockCanvas');
+        
+        canvas.addEventListener('click', (event) => {
+            if (viewMode !== 'derivatives') return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+            
+            const padding = { top: 40, bottom: 20, left: 20, right: 20 };
+            const cardW = (canvas.width - padding.left - padding.right - 45) / 4;
+            const cardH = 65;
+            
+            // 1. Check if clicked on global futures card
+            const cardTop = 38;
+            const futures = (window.futuresData && window.futuresData.futures) ? window.futuresData.futures : [];
+            for (let i = 0; i < 4; i++) {
+                const f = futures[i];
+                if (!f || !f.symbol) continue;
+                const x = padding.left + i * (cardW + 15);
+                if (clickX >= x && clickX <= x + cardW && clickY >= cardTop && clickY <= cardTop + cardH) {
+                    // Clicked on a futures card!
+                    document.getElementById('symbol').value = f.symbol;
+                    switchViewMode('intraday');
+                    updateChart(true);
+                    return;
+                }
+            }
+            
+            // 2. Check if clicked on stock futures card
+            const stockCardTop = 138;
+            const stockFutures = getStockFuturesData();
+            for (let i = 0; i < 2; i++) {
+                const sf = stockFutures[i];
+                const x = padding.left + i * (cardW + 15);
+                if (clickX >= x && clickX <= x + cardW && clickY >= stockCardTop && clickY <= stockCardTop + cardH) {
+                    // Clicked on a stock futures card!
+                    document.getElementById('symbol').value = sf.symbol;
+                    switchViewMode('intraday');
+                    updateChart(true);
+                    return;
+                }
+            }
+            
+            // 3. Check if clicked on a warrant/option row
+            const isUS = isUSMarket();
+            let currentPrice = 100;
+            let stockPctChange = 0;
+            if (intradayData && intradayData.points && intradayData.points.length > 0) {
+                currentPrice = intradayData.points[intradayData.points.length - 1].price;
+                const prevClose = intradayData.prevClose || currentPrice;
+                stockPctChange = ((currentPrice - prevClose) / prevClose) * 100;
+            }
+            const derivativesList = generateDerivatives(activeFinalTicker, currentPrice, stockPctChange, isUS);
+            
+            const derivTop = 225;
+            const tableTop = derivTop + 15;
+            const rowH = 26;
+            
+            derivativesList.forEach((d, idx) => {
+                const y = tableTop + rowH + idx * rowH;
+                if (clickX >= padding.left && clickX <= canvas.width - padding.right && clickY >= y && clickY <= y + rowH) {
+                    // Clicked on a derivative row!
+                    if (!isUS) {
+                        // Taiwan warrants: do nothing!
+                        return;
+                    }
+                    // US options: click to view option chart
+                    document.getElementById('symbol').value = d.code;
+                    switchViewMode('intraday');
+                    updateChart(true);
+                }
+            });
+        });
+
         canvas.addEventListener('mousemove', (event) => {
             const rect = canvas.getBoundingClientRect();
-            mouseX = event.clientX - rect.left; mouseY = event.getClientRects; 
-            mouseX = event.clientX - rect.left; mouseY = event.clientY - rect.top; 
-            drawCanvasChart(); updateTopInfoPanel();
+            mouseX = event.clientX - rect.left; 
+            mouseY = event.clientY - rect.top; 
+            
+            // Check if cursor should be pointer in derivatives mode
+            let shouldBePointer = false;
+            if (viewMode === 'derivatives') {
+                const padding = { top: 40, bottom: 20, left: 20, right: 20 };
+                const cardW = (canvas.width - padding.left - padding.right - 45) / 4;
+                const cardH = 65;
+                
+                // Index Futures Cards
+                const cardTop = 38;
+                for (let i = 0; i < 4; i++) {
+                    const x = padding.left + i * (cardW + 15);
+                    if (mouseX >= x && mouseX <= x + cardW && mouseY >= cardTop && mouseY <= cardTop + cardH) {
+                        shouldBePointer = true;
+                    }
+                }
+                
+                // Stock Futures Cards
+                const stockCardTop = 138;
+                for (let i = 0; i < 2; i++) {
+                    const x = padding.left + i * (cardW + 15);
+                    if (mouseX >= x && mouseX <= x + cardW && mouseY >= stockCardTop && mouseY <= stockCardTop + cardH) {
+                        shouldBePointer = true;
+                    }
+                }
+                
+                // Table Rows (only US options are clickable/pointer)
+                const isUS = isUSMarket();
+                if (isUS) {
+                    let currentPrice = 100;
+                    let stockPctChange = 0;
+                    if (intradayData && intradayData.points && intradayData.points.length > 0) {
+                        currentPrice = intradayData.points[intradayData.points.length - 1].price;
+                        const prevClose = intradayData.prevClose || currentPrice;
+                        stockPctChange = ((currentPrice - prevClose) / prevClose) * 100;
+                    }
+                    const derivativesList = generateDerivatives(activeFinalTicker, currentPrice, stockPctChange, isUS);
+                    const derivTop = 225;
+                    const tableTop = derivTop + 15;
+                    const rowH = 26;
+                    
+                    derivativesList.forEach((d, idx) => {
+                        const y = tableTop + rowH + idx * rowH;
+                        if (mouseX >= padding.left && mouseX <= canvas.width - padding.right && mouseY >= y && mouseY <= y + rowH) {
+                            shouldBePointer = true;
+                        }
+                    });
+                }
+            }
+            
+            if (viewMode === 'kline') {
+                const kChartW = canvas.width - 80;
+                const kAxisH = 25;
+                const kUsableH = canvas.height - kAxisH;
+                const kMainH = kUsableH * 0.52;
+                if (isDragging) canvas.style.cursor = 'grabbing';
+                else if (isRightDragging) canvas.style.cursor = 'ns-resize';
+                else if (mouseX >= kChartW && mouseY <= kMainH) canvas.style.cursor = 'ns-resize';
+                else if (mouseX >= 0 && mouseX < kChartW) canvas.style.cursor = 'grab';
+                else canvas.style.cursor = 'default';
+            } else {
+                canvas.style.cursor = shouldBePointer ? 'pointer' : 'default';
+            }
+            
+            drawCanvasChart(); 
+            updateTopInfoPanel();
         });
+        
         canvas.addEventListener('mouseleave', () => {
             mouseX = -1; mouseY = -1; 
+            canvas.style.cursor = 'default';
             if(rawData.length > 0) currentHoveredCandle = rawData[rawData.length - 1]; 
             if(intradayData.points && intradayData.points.length > 0) currentHoveredPoint = intradayData.points[intradayData.points.length - 1];
             drawCanvasChart(); updateTopInfoPanel();
         });
+        
+        // ================================================================
+        //  K 線互動系統（全新設計）
+        //  滾輪        = 以滑鼠位置為中心做水平縮放
+        //  左鍵拖移    = 左右平移
+        //  右鍵拖移    = Y 軸縮放（往上拖放大 K 棒，往下拖縮小）
+        //  雙擊        = 重置所有縮放與平移
+        // ================================================================
+
+        // 輔助：取得當前 K 線 viewport 參數
+        function _klineViewport() {
+            const chartW = canvas.width - 80;
+            const totalDisplay = Math.min(rawData.length, displayCount);
+            const maxOffset = Math.max(0, rawData.length - totalDisplay);
+            const clampedOffset = Math.max(0, Math.min(dragOffset, maxOffset));
+            const startIndex = Math.max(0, rawData.length - totalDisplay - clampedOffset);
+            const candleWidth = chartW / totalDisplay;
+            return { chartW, totalDisplay, maxOffset, clampedOffset, startIndex, candleWidth };
+        }
+
+        // ── 滾輪：以滑鼠位置為中心水平縮放 ──────────────────────────────
         canvas.addEventListener('wheel', (event) => {
-            if (viewMode !== 'kline') return; 
+            if (viewMode !== 'kline') return;
             event.preventDefault();
-            if (event.deltaY > 0) { displayCount = Math.min(displayCount + 5, 300); } 
-            else { displayCount = Math.max(displayCount - 5, 15); }
-            drawCanvasChart(); 
+
+            const { chartW, totalDisplay, startIndex, candleWidth } = _klineViewport();
+
+            // 找出滑鼠目前懸停在第幾根 K 棒
+            const localX = Math.max(0, Math.min(mouseX, chartW));
+            const hoveredBarIdx = startIndex + Math.floor(localX / candleWidth);
+
+            // 調整 displayCount（放大＝看較少根，縮小＝看較多根）
+            const factor = event.deltaY > 0 ? 1.12 : 0.89;
+            displayCount = Math.max(15, Math.min(1000, Math.round(displayCount * factor)));
+
+            // 讓 hoveredBarIdx 保持在同一水平位置
+            const newTotal = Math.min(rawData.length, displayCount);
+            const newCandleW = chartW / newTotal;
+            const newStartIndex = Math.max(0, hoveredBarIdx - Math.floor(localX / newCandleW));
+            const newMaxOffset = Math.max(0, rawData.length - newTotal);
+            dragOffset = Math.max(0, Math.min(rawData.length - newTotal - newStartIndex, newMaxOffset));
+
+            drawCanvasChart();
         }, { passive: false });
 
+        // ── 雙擊：重置所有縮放與平移 ─────────────────────────────────────
+        canvas.addEventListener('dblclick', () => {
+            if (viewMode !== 'kline') return;
+            yZoomMultiplier = 1.0;
+            yPanOffset = 0;
+            dragOffset = 0;
+            const defaults = { '15m': 100, '30m': 100, '60m': 160, '4h': 160, 'D': 160, 'W': 156, 'M': 120 };
+            displayCount = defaults[currentPeriod] || 80;
+            drawCanvasChart();
+        });
+
+        // ── 滑鼠按下 / 抬起 ──────────────────────────────────────────────
+        let isRightDragging = false;
+        let rightDragStartY = 0;
+        let rightDragStartZoom = 1.0;
+
+        canvas.addEventListener('mousedown', (event) => {
+            if (viewMode !== 'kline') return;
+
+            const rect = canvas.getBoundingClientRect();
+            const localX = event.clientX - rect.left;
+            const localY = event.clientY - rect.top;
+            const chartW = canvas.width - 80;
+            const axisH = 25;
+            const usableH = canvas.height - axisH;
+            const mainH = usableH * 0.62;
+            const isOnPriceAxis = localX >= chartW && localY <= mainH;
+
+            if (event.button === 0 && isOnPriceAxis) {
+                isRightDragging = true;
+                rightDragStartY = event.clientY;
+                rightDragStartZoom = yZoomMultiplier;
+                canvas.style.cursor = 'ns-resize';
+                event.preventDefault();
+            } else if (event.button === 0 && localX < chartW) {
+                isDragging = true;
+                dragStartX = event.clientX;
+                dragStartY = event.clientY;
+                dragStartOffset = dragOffset;
+                dragStartYPanOffset = yPanOffset;
+                canvas.style.cursor = 'grabbing';
+                event.preventDefault();
+            } else if (event.button === 2) {
+                isRightDragging = true;
+                rightDragStartY = event.clientY;
+                rightDragStartZoom = yZoomMultiplier;
+                canvas.style.cursor = 'ns-resize';
+                event.preventDefault();
+            }
+        });
+
+        // 阻止右鍵選單（在 K 線模式下用右鍵做 Y 軸縮放）
+        canvas.addEventListener('contextmenu', (event) => {
+            if (viewMode === 'kline') event.preventDefault();
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                if (viewMode === 'kline') canvas.style.cursor = 'crosshair';
+            }
+            if (isRightDragging) {
+                isRightDragging = false;
+                if (viewMode === 'kline') canvas.style.cursor = 'crosshair';
+            }
+        });
+
+        window.addEventListener('mousemove', (event) => {
+            if (viewMode !== 'kline') return;
+
+            if (isDragging) {
+                // 左鍵：水平平移
+                const chartW = canvas.width - 80;
+                const candleWidth = chartW / Math.min(rawData.length, displayCount);
+                const deltaX = event.clientX - dragStartX;
+                const deltaY = event.clientY - dragStartY;
+                const deltaCandlesRaw = -deltaX / candleWidth;
+                const maxOffset = Math.max(0, rawData.length - Math.min(rawData.length, displayCount));
+                dragOffset = Math.max(0, Math.min(Math.round(dragStartOffset + deltaCandlesRaw), maxOffset));
+
+                const axisH = 25;
+                const usableH = canvas.height - axisH;
+                const mainH = usableH * 0.62;
+                const totalDisplay = Math.min(rawData.length, displayCount);
+                const startIndex = Math.max(0, rawData.length - totalDisplay - dragOffset);
+                const visibleData = rawData.slice(startIndex, startIndex + totalDisplay);
+                const prices = [];
+                visibleData.forEach(d => {
+                    prices.push(d.high, d.low);
+                    if (d.ma5) prices.push(d.ma5);
+                    if (d.ma20) prices.push(d.ma20);
+                    if (d.ma60) prices.push(d.ma60);
+                });
+                const maxPrice = Math.max(...prices);
+                const minPrice = Math.min(...prices);
+                const adjustedRange = Math.max(0.0001, (maxPrice - minPrice) * Math.max(0.05, yZoomMultiplier) * 1.1);
+                yPanOffset = dragStartYPanOffset + (deltaY / mainH) * adjustedRange;
+                drawCanvasChart();
+            }
+
+            if (isRightDragging) {
+                // 右鍵：Y 軸縮放
+                // 往上拖（deltaY < 0）→ multiplier 減小 → 區間縮小 → K 棒變高（放大）
+                // 往下拖（deltaY > 0）→ multiplier 增大 → 區間放大 → K 棒變矮（縮小）
+                const deltaY = event.clientY - rightDragStartY;
+                const scaleFactor = Math.pow(2, deltaY / 150);
+                yZoomMultiplier = Math.max(0.05, Math.min(4.0, rightDragStartZoom * scaleFactor));
+                drawCanvasChart();
+            }
+        });
+
+        // ── 切換圖表模式時重置狀態 ───────────────────────────────────────
+        const _origSwitchViewMode = switchViewMode;
+        switchViewMode = function(mode) {
+            _origSwitchViewMode(mode);
+            isDragging = false;
+            isRightDragging = false;
+            if (mode !== 'kline') {
+                dragOffset = 0;
+                canvas.style.cursor = 'default';
+            } else {
+                canvas.style.cursor = 'crosshair';
+            }
+        };
+
         window.addEventListener('resize', drawCanvasChart);
-        window.onload = () => { renderHistoryList(); updateChart(true); };
+        window.onload = () => { 
+            renderHistoryList(); 
+            updateWatchlistPrices(); 
+            updateChart(true); 
+        };
     </script>
 </body>
 </html>
